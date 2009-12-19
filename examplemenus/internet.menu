@@ -1,0 +1,19 @@
+item
+  Online
+  kppp -c "Clara Freetime Unlimited"
+
+item
+  Mail
+  kmail
+
+item
+  Mozilla
+  /opt/mozilla/mozilla
+
+item
+  Konqueror
+  kfmclient openProfile webbrowsing
+
+item
+  Links
+  konsole -e links http://localhost

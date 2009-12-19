@@ -1,0 +1,6 @@
+Extend dynamic menu idea - perhaps a CGI-ish mechanism, where an arbitrary
+program can be called to generate the menus on the fly.
+(Would allow a MAME frontend, etc. to be implemented)
+
+Framebuffer support (long term goal)
+

@@ -1,0 +1,8 @@
+09.11.2002
+ - Integrated patches from Massimo Maricchiolo (config file) and Kresimir Kukulj
+   (command line options).
+ - Added command line option for specifying font by family name.
+ - Integrated patch from Alexander Belov, providing browse functionality.
+ - Changed Alexander's feature to browse_recurse, and implemented a non-recursive
+   version under the browse keyword.
+   

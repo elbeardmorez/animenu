@@ -1,0 +1,43 @@
+# animenu config file by Massimo Maricchiolo <mmaricch@yahoo.com>
+# Modifications by Alastair M. Robinson
+
+##################################################################
+#
+# Select a font from its name and size:
+#
+# fontname<=| |\t>font name[<,|\t>font size]
+# Default font size is 36
+
+fontname=Palladio L, 36
+
+##################################################################
+#
+# Select a font from its font specification:
+#
+# fontdesc<=| |\t>font specification
+#
+# The *'s are wildcards and the fields in order are:
+# foundry (i.e. creator of font), family (i.e. name), weight, style,
+# pixel size, point size, x and y resolutions, spacing, average width,
+# encoding registry, and encoding
+#
+# You can use xfontsel to create one of these specifications.
+#
+# If you specify both fontname and fontdesc, what stated in fontdesc
+# override the setting made in fontname.
+# The default fontdesc is:
+#   -misc-fixed-medium-r-normal--36-*-75-75-c-*-iso8859-*
+
+#font = -*-mistral-*-*-*-*-36-*-75-75-*-*-iso8859-*
+
+##################################################################
+#
+# Select the text color with a name or rgb value
+#
+# rgbcolor<=| |\t>rgb text color<,| |\t>rgb selected text color
+#
+# the rgb colors must be in the format: "rgb:rr/gg/bb" without quote.
+#
+
+color = rgb:5d/ff/10, rgb:ce/ff/cf
+

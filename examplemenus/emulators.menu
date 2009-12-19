@@ -1,0 +1,9 @@
+item
+  UAE
+  cd /home/amr/uae-0.8.15 && uae
+item
+  BasiliskII
+  /home/amr/emulators/BasiliskII/BasiliskII
+item
+  GnoMAME
+  gnomame
