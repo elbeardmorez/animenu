@@ -1,13 +1,11 @@
-Animenu was written from 2001 - 2003 by Alastair M. Robinson.
 
-OSD code very loosely based on code from wmix by timecop.
+# developers
+Pete Beardmore (2009)
+Alastair M. Robinson. (2001-2003)
+Alexandar Belov (2002-2003)
+Kresimir Kukulj (2002)
+Massimo Maricchiolo (2002)
 
-Thanks to Marimus for pointing out some bugs in both the code and
-documentation.
+# bug reporters
+Marimus
 
-Thanks to Kresimir Kukulj for increasing Animenu's flexibility with
-command-line options.
-
-Thanks to Massimo Maricchiolo for implementing the configuration file.
-
-Thanks to Alexandar Belov for implementing the browse menu type.

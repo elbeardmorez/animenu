@@ -1,22 +1,20 @@
-Like much open source Linux software, animenu must be built from source.
-This entails the following steps from a console:
+
+like much open source Linux software, animenu is distributed as source. to
+build and install it, execute the following standard commands from a console:
 
   ./configure
   make
   make install
 
-The following options exist for customising animenu at the configure stage:
+the following options exist for customising animenu at the configure stage:
 
-  --disable-xft
-Turns off the transparency effect, and allows linking without Xft.
+  disable use Xft, turning off the transparency effect
+    --disable-xft [default: system]
 
-This feature will be automatically disabled if the appropriate
-libraries are not available.
+  disable use of xpm library for icons
+    --disable-icons [default: system]
 
-Once you've compiled and installed animenu, you will also have to adjust
-your .lircrc file - the commands supported by irmix are detailed in the
-README file.
+having installed animenu, you need to adjust your '.lircrc' file to use any
+of the supported animenu commands (see README file for details), and as a
+minimum create a root.menu file (see README file for details)
 
-You will also need to create some menus.  There are some examples in the
-example menus directory - you might like to copy this directory to ~/.animenu
-to get a feel for what AniMenu can do.

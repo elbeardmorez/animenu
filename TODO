@@ -1,6 +1,36 @@
-Extend dynamic menu idea - perhaps a CGI-ish mechanism, where an arbitrary
-program can be called to generate the menus on the fly.
-(Would allow a MAME frontend, etc. to be implemented)
 
-Framebuffer support (long term goal)
+# short term
+-merge ChangeLog/NEWS/git log
+-update authors
+-add 'forward' lirc control to allow 'select' actions on folders (rather than simply descending)
+-re-structure files, mv source to src, rename examples folder
+-autoconf/make recursive build
+-remove old build files
+-fix source
+--untabify
+--remove trailing white-space
+--add white-space around assignment and equality operators
+--squash control structures
+--refactor names
+-fix segfault on empty folders
+-fix various failing regexp based browse menus
+-rework/merge root/submenu creation
+-use an options struct for animenu_create
+-root menu name command line /rc file option
+-browse blocks
+-expand regular expressions support
+-browse sort order
+-max menu width
+-scrollable items
+-overlapping menu nesting
+-menu headers
+-item padding add menu pointer
+-remove rigid 3 line menu configuration structure
+-allow comments in menu file
+
+# long term
+-real transparency
+-framebuffer support
+-extend dynamic menu idea
+ perhaps a CGI-ish mechanism, where an arbitrary program can be called to generate the menus on the fly. this would fascilitate use as a MAME frontend etc.
 

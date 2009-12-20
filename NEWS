@@ -1,7 +1,3 @@
-0.1.1 - 11.08.2001
-  Project started - inspired by osdmenu by Toby Jaffey.  Osdmenu is a great
-  idea, and works very nicely, but I wanted something more visually striking
-  - something I could use to show off my machine!
-0.3 - 16.01.2003
-  A move away from static menus - Alexander Belov's patch allows a menu to
-  be constructed on the fly (at load-time) from the contents of a directory.
+
+no news is good news no?
+

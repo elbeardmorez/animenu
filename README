@@ -1,125 +1,93 @@
-INTRODUCTION:
-~~~~~~~~~~~~~
+##############
+# introduction
 
-Animenu is intended as a companion program to the brilliant lirc project.
-Not unlike the osdmenu program by Toby Jaffey, this program provides a menu
-system, navigable via an infra-red remote control, and capable of lauching
-programs.  However, while osdmenu is utilitarian, animenu is intended to be
-over the top and ostentatious - use it for showing off the flexibility of
-Linux to Windoze users!
+animenu is intended as a companion program to the brilliant lirc project.
+this program provides a menu system, navigable via an infra-red remote
+control and capable of launching programs
 
-Animenu can provide animations for the menus appearing and collapsing, and
-uses the Xft extension for translucency.  (Unfortunately, as with my previous
-project, irmix, the translucency is a fake - if the contents of windows under
-the menus should change, the changes won't show through...)
+arbitrary system commands can be executed in a standalone manner, or in a
+file context via filesystem hierarchy navigation
 
-NEW FOR VERSION 0.3:
-This release begins a move away from static menus.  Alexander Belov has
-contributed a patch allowing the contents of a directory (with regexp pattern
-matching) to be used as a menu - ideal for use in conjunction with mplayer,
-xmms, etc.
+animenu can provide animations for the menus appearing and collapsing, and
+uses the Xft extension for (pseudo) translucency
 
-Animenu is released under the GPL version 2; for details please see the file
+#########
+# history
+
+this project was created by Alastair M. Robinson between 2001-2003, where it
+reached release version 0.3 with work from several contributors. it was
+inspired by 'osdmenu' (Toby Jaffey) but with the original of goal of being
+more visually impressive. it bases its OSD code (very loosely) on 'wmix'
+(timecop). with no work seen for 10 years, the project was cloned and
+re-worked by Pete Beardmore. refer to the ChangeLog file for details
+
+#########
+# licence
+
+animenu is released under the GPL version 2; for details please see the file
 "COPYING".
 
-This is my second Linux project, so please feel free to provide me with
-feedback and constructive criticism.
+##########
+# commands
 
+animenu takes the following options:
 
-USAGE:
-~~~~~~
-Animenu takes the following options:
-         -h --help              display a help message
-         -v --version           display version
-         -d --daemon            run in background
-         -f --font              use specified font
-                                (X11 fontspec, as returned by xfontsel)
-         -n --fontname          specify font by family name only
-                                (i.e. Times, Mistral, etc.)
-         -c --fgcolor           use specified foreground color
-         -s --selectfgcolor     color of selected item
-         -t --menutimeout       how long before menu dissapears (0 for no timeout)
-         -a --menuanimation     menu animation speed (microseconds)
-         -D --dump              dump menu structure to screen
+  -h --help              display a help message
+  -v --version           display version
+  -d --daemon            run in background
+  -f --font              use specified font
+                         (X11 fontspec, as returned by xfontsel)
+  -n --fontname          specify font by family name only
+                         (i.e. Times, Mistral, etc.)
+  -c --fgcolor           use specified foreground color
+  -s --selectfgcolor     color of selected item
+  -t --menutimeout       how long before menu disappears (0 for no timeout)
+  -a --menuanimation     menu animation speed (microseconds)
+  -D --dump              dump menu structure to screen
 
-Many thanks to Kresimir Kukulj for implementing most of these options.
+###############
+# lirc commands
 
+the following commands can be used in your '.lircrc' file:
 
-Config file:
-~~~~~~~~~~~~
-A new feature for version 0.2 is the ability to use a configuration file.
-Thanks to Massimo Maricchiolo for implementing this feature.
+  Show
+  Next
+  Prev
+  Select
+  Back
 
-The config file is searched at ~/.animenu/animenurc - an example file
-can be found in the examplemenus directory, and the options are well documented
-within this file.
+#####################
+# configuration files
+~/.animenu/animenurc  : run control file which may contain any of the above
+                        options. note these options are overridden by command
+                        line options
+~/.animenu/root.menu  : root menu file. note this location is overridden by
+                        './root.menu' existence
 
+#############
+# menu format
 
-Commands for use in .lircrc:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The following commands can be used in your .lircrc file:
-
-Show
-
-Next
-
-Prev
-
-Select
-
-Back
-
-The meanings of these commands should be self-explanatory!
-
-
-How to define menus:
-~~~~~~~~~~~~~~~~~~~~
-
-The menus themselves are defined in text files; at startup animenu will attempt
-to open "root.menu" and if that fails, it will try to load
-"~/.animenu/root.menu"
-
-Each menu item is defined on a set of three lines, and can take one of the
-following forms:
+menus are configured in plain text files, and take the following format
 
 item
-  <Item title>
+  <title>
   <command>
 
 menu
-  <Submenu title>
-  <filename of submenu>
+  <title>
+  </path/to/menu>
 
-Thanks to Alexandar Belov, you can also use:
+browse /path/regexp_pattern
+  <title>
+  <command for selected file>
 
-browse /full/path/regexp_pattern
-  <Submenu title>
-  <command, to be called with selected file as an argument>
+browse_re curse /path/regexp_pattern
+  <title>
+  <command for selected file>
 
-and a recursive version of the above:
+see 'examples' directory for inspiration
 
-browse_recurse /full/path/regexp_pattern
-  <Submenu titlei>
-  <command, to be called with selected file as an argument>
+######
+# misc
+-note that there is currently no protection against circular references!
 
-An example menu set, demonstrating the use of all four entry types can
-be found in the examplemenus directory.
-
-Whitespace at the beginning of each line is ignored, so you can use indenting
-to make the file easier to read.
-
-Like the root menus, submenu files will be sought first in the current
-directory, and if that fails, in ~/.animenu/
-
-Please note:  There is currently no protection against circular references!
-
-
-CONTACT:
-~~~~~~~~
-
-I can be contacted at:
-blackfive@fakenhamweb.co.uk
-
---
-
-Alastair M. Robinson

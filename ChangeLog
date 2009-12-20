@@ -1,8 +1,14 @@
-09.11.2002
- - Integrated patches from Massimo Maricchiolo (config file) and Kresimir Kukulj
-   (command line options).
- - Added command line option for specifying font by family name.
- - Integrated patch from Alexander Belov, providing browse functionality.
- - Changed Alexander's feature to browse_recurse, and implemented a non-recursive
-   version under the browse keyword.
-   
+
+2003Jan16 version 0.3 (release)
+ - a move away from static menus. on-the-fly construction of browse directory
+   contents at run-time (Alexander Belov)
+2002Nov09 version 0.2 (release)
+ - configuration file implementation (Massimo Maricchiolo)
+ - command line options (Kresimir Kukulj)
+ - additional command line options (Alastair M. Robinson)
+ - added command line option for specifying font by family name
+ - browse functionality (Alexander Belov)
+ - non-recursive browse functionality (Alastair M. Robinson)
+2001Aug11 version 0.1.1
+ - project initialisation
+
