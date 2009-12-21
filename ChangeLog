@@ -1,4 +1,3 @@
-
 2003Jan16 version 0.3 (release)
  - a move away from static menus. on-the-fly construction of browse directory
    contents at run-time (Alexander Belov)
@@ -11,4 +10,3 @@
  - non-recursive browse functionality (Alastair M. Robinson)
 2001Aug11 version 0.1.1
  - project initialisation
-

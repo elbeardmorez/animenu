@@ -1,19 +1,14 @@
 
 # short term
--merge ChangeLog/NEWS/git log
--update authors
 -add 'forward' lirc control to allow 'select' actions on folders (rather than simply descending)
 -re-structure files, mv source to src, rename examples folder
 -autoconf/make recursive build
 -remove old build files
--fix source
---untabify
---remove trailing white-space
---add white-space around assignment and equality operators
---squash control structures
---refactor names
+-refactor variable names
+-update license information and headers
 -fix segfault on empty folders
 -fix various failing regexp based browse menus
+-fix logic errors in options.c
 -rework/merge root/submenu creation
 -use an options struct for animenu_create
 -root menu name command line /rc file option
