@@ -42,6 +42,7 @@ enum optresults {opt_null, opt_daemonise, opt_exit_failure, opt_exit_success};
 /* globals */
 static long osd_utime;
 static struct animenucontext *rootmenu;
+static struct animenucontext *currentmenu;
 static int alarm_pending;
 char *fontname = "-misc-fixed-medium-r-normal--36-*-75-75-c-*-iso8859-*";
 char *fgcolor = "rgb:00/ff/00", *bgcolor = "black", *selectfgcolor = "rgb:bf/ff/bf";
@@ -145,7 +146,6 @@ int main(int argc, char *argv[]) {
   struct lirc_config *config;
   int daemonise = 0;
   int currentchannel = 0;
-  struct animenuitem *selected_item = NULL;
 
   switch (process_options(argc, argv)) {
     case opt_exit_success:
@@ -206,28 +206,40 @@ int main(int argc, char *argv[]) {
             case id_show:
               if (rootmenu->visible) {
                 rootmenu->hide(rootmenu);
-                selected_item = NULL;
-              } else
+                currentmenu = NULL;
+              } else {
                 rootmenu->show(rootmenu);
+                rootmenu->next(rootmenu);
+                /* navigate based on currentmenu */
+                currentmenu = rootmenu;
+              }
               break;
             case id_next:
-              rootmenu->next(rootmenu);
+              if (currentmenu != NULL)
+                currentmenu->next(currentmenu);
               break;
             case id_prev:
-              rootmenu->prev(rootmenu);
+              if (currentmenu != NULL)
+                currentmenu->prev(currentmenu);
               break;
             case id_select:
-              if (rootmenu->currentitem && rootmenu->currentitem->type == animenuitem_submenu && selected_item == NULL)
-                selected_item = rootmenu->currentitem;
-              rootmenu->select(rootmenu);
+              if (currentmenu != NULL && currentmenu->currentitem != NULL) {
+                if (currentmenu->currentitem->type == animenuitem_submenu) {
+                  currentmenu->currentitem->select(currentmenu->currentitem);
+                  if ((currentmenu->currentitem->submenu != NULL) &&
+                      (currentmenu->currentitem->submenu->visible)) {
+                    currentmenu = currentmenu->currentitem->submenu;
+                    currentmenu->next(currentmenu);
+                  }
+                } else
+                  currentmenu->currentitem->go(currentmenu->currentitem);
+              }
               break;
             case id_back:
-              if ((selected_item != NULL)
-                  && (selected_item->submenu->visible)) {
-                rootmenu->hide(selected_item->submenu);
-                rootmenu->currentitem = selected_item;
-                rootmenu->showcurrent(selected_item->submenu);
-                selected_item = NULL;
+              if(currentmenu != NULL && currentmenu->parent != NULL) {
+                currentmenu->hide(currentmenu);
+                currentmenu = currentmenu->parent;
+                currentmenu->showcurrent(currentmenu);
               }
               break;
           }
@@ -246,8 +258,6 @@ int main(int argc, char *argv[]) {
     }
     lirc_freeconfig(config);
   }
-
-  rootmenu->dispose(rootmenu);
 
   lirc_deinit();
 

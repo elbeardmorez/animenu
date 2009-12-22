@@ -9,7 +9,6 @@
 -fix segfault on empty folders
 -fix various failing regexp based browse menus
 -fix logic errors in options.c
--rework/merge root/submenu creation
 -use an options struct for animenu_create
 -root menu name command line /rc file option
 -browse blocks

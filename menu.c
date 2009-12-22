@@ -34,13 +34,12 @@ static void animenuitem_dispose(struct animenuitem *mi);
 static int animenuitem_setitem(struct animenuitem *mi, char *title, char *command);
 static int animenuitem_setsubmenu(struct animenuitem *mi, char *title, struct animenucontext *submenu);
 static void *animenuitem_thread(void *ud);
+static void animenuitem_select(struct animenuitem *mi);
 static void animenuitem_go(struct animenuitem *mi);
-static struct animenuitem *animenuitem_create(struct animenucontext *menu);
 static void animenu_dispose(struct animenucontext *menu);
 static void animenu_showcurrent(struct animenucontext *menu);
 static void animenu_next(struct animenucontext *menu);
 static void animenu_prev(struct animenucontext *menu);
-static void animenu_select(struct animenucontext *menu);
 static void animenu_show(struct animenucontext *menu);
 static void animenu_hideframe(struct animenucontext *menu, int frame);
 static void animenu_hide(struct animenucontext *menu);
@@ -119,22 +118,20 @@ static void *animenuitem_thread(void *ud) {
 }
 
 static void animenuitem_go(struct animenuitem *mi) {
+  /* hide the menu hierarchy */
+  struct animenucontext *parent = NULL;
+  parent = mi->parent;
+  /* iterate back through the context/menu hierarchy to the root */
+  while (parent->parent)
+    parent = parent->parent;
+  parent->hide(parent);
+
+  /* execute the item's command */
   pthread_t thread;
-  struct animenucontext *menu;
-  if (mi->type == animenuitem_submenu) {
-    mi->submenu->currentitem = mi->submenu->firstitem;
-    mi->submenu->show(mi->submenu);
-    animenu_showcurrent(mi->submenu);
-  } else {
-    menu = mi->parent;
-    while (menu->parent)
-      menu = menu->parent;
-    menu->hide(menu);
-    pthread_create(&thread, NULL, animenuitem_thread, mi->command);
-  }
+  pthread_create(&thread, NULL, animenuitem_thread, mi->command);
 }
 
-static struct animenuitem *animenuitem_create(struct animenucontext *menu) {
+struct animenuitem *animenuitem_create(struct animenucontext *menu) {
   struct animenuitem *mi;
 
   if (!(mi = malloc(sizeof(struct animenuitem))))
@@ -142,6 +139,7 @@ static struct animenuitem *animenuitem_create(struct animenucontext *menu) {
 
   mi->dispose = animenuitem_dispose;
   mi->go = animenuitem_go;
+  mi->select = animenuitem_select;
   mi->setitem = animenuitem_setitem;
   mi->setsubmenu = animenuitem_setsubmenu;
 
@@ -239,13 +237,11 @@ static void animenu_prev(struct animenucontext *menu) {
   }
 }
 
-static void animenu_select(struct animenucontext *menu) {
-  struct animenuitem *item = menu->currentitem;
-  if (item) {
-    if ((item->type == animenuitem_submenu) && (item->submenu->visible))
-      item->submenu->select(item->submenu);
-    else
-      item->go(item);
+static void animenuitem_select(struct animenuitem *mi) {
+  if (mi->type == animenuitem_submenu) {
+    mi->submenu->currentitem = mi->submenu->firstitem;
+    mi->submenu->show(mi->submenu);
+    animenu_showcurrent(mi->submenu);
   }
 }
 
@@ -262,7 +258,6 @@ static void animenu_select(struct animenucontext *menu) {
      If the submenu is invisible, or there isn't one,
        we hide the current menu instead.
 */
-
 static void animenu_show(struct animenucontext *menu) {
   if ((menu) && (menu->osd)) {
     if (menu->visible) {
@@ -287,7 +282,7 @@ static void animenu_show(struct animenucontext *menu) {
 static void animenu_hideframe(struct animenucontext *menu, int frame) {
   struct animenuitem *item = menu->firstitem;
   while (item) {
-    if (item->type == animenuitem_submenu)
+    if (item->submenu != NULL && item->submenu->visible)
       animenu_hideframe(item->submenu, frame);
     item = item->next;
   }
@@ -422,10 +417,10 @@ static struct animenucontext *animenu_create_browse(struct animenucontext *paren
     return(NULL);
   memset(menu, 0, sizeof(struct animenucontext));
 
+  /* function pointers */
   menu->dispose = animenu_dispose;
   menu->next = animenu_next;
   menu->prev = animenu_prev;
-  menu->select = animenu_select;
   menu->show = animenu_show;
   menu->showcurrent = animenu_showcurrent;
   menu->hide = animenu_hide;
@@ -523,7 +518,6 @@ struct animenucontext *animenu_create(struct animenucontext *parent, const char 
   menu->dispose = animenu_dispose;
   menu->next = animenu_next;
   menu->prev = animenu_prev;
-  menu->select = animenu_select;
   menu->show = animenu_show;
   menu->showcurrent = animenu_showcurrent;
   menu->hide = animenu_hide;

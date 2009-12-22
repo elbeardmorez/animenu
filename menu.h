@@ -10,7 +10,6 @@ struct animenucontext {
   void (*dispose) (struct animenucontext *menu);
   void (*next) (struct animenucontext *menu);
   void (*prev) (struct animenucontext *menu);
-  void (*select) (struct animenucontext *menu);
   void (*show) (struct animenucontext *menu);
   void (*showcurrent) (struct animenucontext *menu);
   void (*hide) (struct animenucontext *menu);
@@ -26,6 +25,7 @@ struct animenuitem {
   /* public functions */
   void (*dispose) (struct animenuitem *mi);
   void (*go) (struct animenuitem *mi);
+  void (*select) (struct animenuitem *mi);
   int (*setitem) (struct animenuitem *mi, char *title, char *command);
   int (*setsubmenu) (struct animenuitem *mi, char *title, struct animenucontext *menu);
   /* private data follows */
@@ -39,6 +39,7 @@ struct animenuitem {
 };
 
 struct animenucontext *animenu_create(struct animenucontext *parent, const char *filename);
+struct animenuitem *animenuitem_create(struct animenucontext *menu);
 
 void animenu_test();
 
