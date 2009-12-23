@@ -26,7 +26,7 @@
 
 char *progname = PACKAGE "-" VERSION;
 
-enum myids {id_null, id_show, id_next, id_prev, id_select, id_back};
+enum myids {id_null, id_show, id_next, id_prev, id_select, id_back, id_forward};
 
 struct easyoption myoptions[] = {
   {id_show, "show", 0, 0, 0, 0, 0},
@@ -34,6 +34,7 @@ struct easyoption myoptions[] = {
   {id_prev, "prev", 0, 0, 0, 0, 0},
   {id_select, "select", 0, 0, 0, 0, 0},
   {id_back, "back", 0, 0, 0, 0, 0},
+  {id_forward, "forward", 0, 0, 0, 0, 0},
   {0, NULL, 0, 0, 0, 0, 0}
 };
 
@@ -223,23 +224,24 @@ int main(int argc, char *argv[]) {
                 currentmenu->prev(currentmenu);
               break;
             case id_select:
-              if (currentmenu != NULL && currentmenu->currentitem != NULL) {
-                if (currentmenu->currentitem->type == animenuitem_submenu) {
-                  currentmenu->currentitem->select(currentmenu->currentitem);
-                  if ((currentmenu->currentitem->submenu != NULL) &&
-                      (currentmenu->currentitem->submenu->visible)) {
-                    currentmenu = currentmenu->currentitem->submenu;
-                    currentmenu->next(currentmenu);
-                  }
-                } else
-                  currentmenu->currentitem->go(currentmenu->currentitem);
-              }
+              if (currentmenu != NULL && currentmenu->currentitem != NULL)
+                currentmenu->currentitem->go(currentmenu->currentitem);
               break;
             case id_back:
               if(currentmenu != NULL && currentmenu->parent != NULL) {
                 currentmenu->hide(currentmenu);
                 currentmenu = currentmenu->parent;
                 currentmenu->showcurrent(currentmenu);
+              }
+              break;
+            case id_forward:
+              if (currentmenu != NULL && currentmenu->currentitem != NULL) {
+                currentmenu->currentitem->select(currentmenu->currentitem);
+                if ((currentmenu->currentitem->submenu != NULL) &&
+                    (currentmenu->currentitem->submenu->visible)) {
+                  currentmenu = currentmenu->currentitem->submenu;
+                  currentmenu->next(currentmenu);
+                }
               }
               break;
           }

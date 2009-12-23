@@ -1,6 +1,5 @@
 
 # short term
--add 'forward' lirc control to allow 'select' actions on folders (rather than simply descending)
 -re-structure files, mv source to src, rename examples folder
 -autoconf/make recursive build
 -remove old build files
