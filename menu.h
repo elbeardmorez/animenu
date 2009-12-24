@@ -3,7 +3,7 @@
 
 #include "osd.h"
 
-enum animenuitem_type {animenuitem_null, animenuitem_command, animenuitem_submenu};
+enum animenuitem_type {animenuitem_null, animenuitem_command, animenuitem_submenu, animenuitem_browse};
 
 struct animenucontext {
   /* public functions */
@@ -26,19 +26,25 @@ struct animenuitem {
   void (*dispose) (struct animenuitem *mi);
   void (*go) (struct animenuitem *mi);
   void (*select) (struct animenuitem *mi);
-  int (*setitem) (struct animenuitem *mi, char *title, char *command);
-  int (*setsubmenu) (struct animenuitem *mi, char *title, struct animenucontext *menu);
+  int (*setitem) (struct animenuitem *mi, enum animenuitem_type type,
+                  char *title, char *path, char *regex, char *command, int recurse);
+  int (*setsubmenu) (struct animenuitem * mi, char *title, struct animenucontext *menu);
   /* private data follows */
   struct animenuitem *next, *prev;
   struct animenucontext *parent;
   enum animenuitem_type type;
   char *title;
-  char *command;  /* if type is animenuitem_command */
-  struct animenucontext *submenu;  /* if type is animenuitem_submenu */
+  char *path;
+  char *regex;
+  char *command;
+  int recurse;
+  struct animenucontext *submenu;
   struct osditemdata osddata;
 };
 
-struct animenucontext *animenu_create(struct animenucontext *parent, const char *filename);
+int animenu_browse(struct animenuitem *mi);
+struct animenucontext *animenu_create(struct animenucontext *parent,
+                                      enum animenuitem_type type, const char *filename);
 struct animenuitem *animenuitem_create(struct animenucontext *menu);
 
 void animenu_test();

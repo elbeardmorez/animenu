@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <getopt.h>
+#include <limits.h>
 #include <lirc/lirc_client.h>
 
 #include "tokenize.h"
@@ -161,12 +162,14 @@ int main(int argc, char *argv[]) {
   }
   if (menutimeout < 0 || menuanimation < 0) {
     fprintf(stderr, "menutimeout and menuanimation must be >= 0.\n");
-    return(0);
+    return(EXIT_FAILURE);
   }
 
-  if (!(rootmenu = animenu_create(NULL, "root.menu"))) {
+  char file[PATH_MAX] = "";
+  snprintf(file, PATH_MAX - 1, "%s/.animenu/%s", getenv("HOME"), "root.menu");
+  if (!(rootmenu = animenu_create(NULL, animenuitem_submenu, file))) {
     fprintf(stderr, "cannot create root menu!\n");
-    return(0);
+    return(EXIT_FAILURE);
   }
   if (dump) {
     animenu_dump(rootmenu);
