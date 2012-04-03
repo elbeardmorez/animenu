@@ -30,6 +30,9 @@
 #define _strncpy(A,B,C) strncpy(A,B,C), *(A+(C)-1)='\0'
 #define _strncat(A,B,C) strncat(A,B,C), *(A+(C)-1)='\0'
 
+/* globals */
+const char *playall = "| play all |";
+
 static void animenuitem_dispose(struct animenuitem *mi);
 static int animenuitem_setitem(struct animenuitem *mi, enum animenuitem_type type,
                                char *title, char *path, char* regex, char *command, int recurse);
@@ -527,7 +530,7 @@ int animenu_browse(struct animenuitem *mi) {
     }
 
     mi2 = animenuitem_create(menu);
-    mi2->setitem(mi2, animenuitem_command, ">play all<", NULL, NULL, all_cmd, 0);
+    mi2->setitem(mi2, animenuitem_command, (char*)playall, NULL, NULL, all_cmd, 0);
     for (file_cur = file_root; file_cur != NULL; file_cur = file_cur->next) {
       mi2 = animenuitem_create(menu);
       /* command */

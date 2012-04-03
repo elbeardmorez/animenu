@@ -48,6 +48,7 @@ static struct animenucontext *currentmenu;
 static int alarm_pending;
 char *fontname = "-misc-fixed-medium-r-normal--36-*-75-75-c-*-iso8859-*";
 char *fgcolor = "rgb:00/ff/00", *bgcolor = "black", *selectfgcolor = "rgb:bf/ff/bf";
+
 int menutimeout = 5, menuanimation = 10000;
 int dump = 0;
 
@@ -213,7 +214,11 @@ int main(int argc, char *argv[]) {
                 currentmenu = NULL;
               } else {
                 rootmenu->show(rootmenu);
+//                printf("root | current item: '%s'\n",
+//                       rootmenu->currentitem ? rootmenu->currentitem->title : "NULL");
                 rootmenu->next(rootmenu);
+//                printf("root | current item: '%s'\n",
+//                       rootmenu->currentitem ? rootmenu->currentitem->title : "NULL");
                 /* navigate based on currentmenu */
                 currentmenu = rootmenu;
               }
@@ -243,7 +248,9 @@ int main(int argc, char *argv[]) {
                 if ((currentmenu->currentitem->submenu != NULL) &&
                     (currentmenu->currentitem->submenu->visible)) {
                   currentmenu = currentmenu->currentitem->submenu;
-                  currentmenu->next(currentmenu);
+                  if (strstr(currentmenu->currentitem->title, playall) != 0)
+                    currentmenu->next(currentmenu);
+//                  printf("current item: '%s'\n", currentmenu->currentitem->title);
                 }
               }
               break;

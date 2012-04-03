@@ -3,6 +3,9 @@
 
 #include "osd.h"
 
+/* globals */
+const char *playall;
+
 enum animenuitem_type {animenuitem_null, animenuitem_command, animenuitem_submenu, animenuitem_browse};
 
 struct animenucontext {
