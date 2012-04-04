@@ -1,3 +1,19 @@
+2012Apr04 version d6d7a79360ecfaccb18d18ce3aafdb768eec01aa
+ - [add] debug option (Pete Beardmore)
+2012Apr03 version 3bde60a7122cd09a11db4f8018c03fdc6f10202f
+ - [fix] initial current item selection (Pete Beardmore)
+2009Dec24 version bb631dff7f04a286db8e9f6f231abfe0b74c59e1
+ - [imp] browse menu refactoring (Pete Beardmore)
+2009Dec23 version a7bc98e1539864d88d2e7488abd19fa68b6a31e3
+ - [add] forward navigation command (Pete Beardmore)
+2009Dec22 version ae3addd9131cab5502f767af4e7043105f40d9cf
+ - [imp] persist current context (Pete Beardmore)
+2009Dec21 version e0cc99cd9e4757915c45d8e24c96bd6658b412e1
+ - [imp] modify code style (Pete Beardmore)
+2009Dec20 version f0c8266cd94fc4633875c248bf69d1af8b088479
+ - [imp] update project files (Pete Beardmore)
+2009Dec19 version 13420c9b43a510a6245f86a66496896a3cd168ce
+ - [sup] import animenu-0.3.0 source (Alastair Robinson)
 2003Jan16 version 0.3 (release)
  - a move away from static menus. on-the-fly construction of browse directory
    contents at run-time (Alexander Belov)
