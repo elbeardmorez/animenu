@@ -43,7 +43,8 @@ animenu takes the following options:
   -s --selectfgcolor     color of selected item
   -t --menutimeout       how long before menu disappears (0 for no timeout)
   -a --menuanimation     menu animation speed (microseconds)
-  -D --dump              dump menu structure to screen
+  -M --dump              dump menu structure to screen
+  -D[x] --debug[=x]      enable log, optional verbosity level [1 .. 2] (default: 1)
 
 ###############
 # lirc commands

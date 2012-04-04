@@ -78,10 +78,11 @@ int process_options(int argc, char *argv[]) {
       {"selectfgcolor", required_argument, NULL, 's'},
       {"menutimeout", required_argument, NULL, 't'},
       {"menuanimation", required_argument, NULL, 'a'},
-      {"dump", no_argument, NULL, 'D'},
+      {"dump", no_argument, NULL, 'M'},
+      {"debug", optional_argument, NULL, 'D'},
       {0, 0, 0, 0}
     };
-    c = getopt_long(argc, argv, "hvdf:n:c:s:t:a:D", long_options, NULL);
+    c = getopt_long(argc, argv, "hvdf:n:c:s:t:a:M:D::", long_options, NULL);
     if (c == -1)
       break;
     switch (c) {
@@ -99,7 +100,8 @@ int process_options(int argc, char *argv[]) {
         printf("\t -s --selectfgcolor\t\tcolor of selected item\n");
         printf("\t -t --menutimeout\t\thow long before menu dissapears (0 for no timeout)\n");
         printf("\t -a --menuanimation\t\tmenu animation speed (microseconds)\n");
-        printf("\t -D --dump\t\tdump menu structure to screen\n");
+        printf("\t -M --dump\t\tdump menu structure to screen\n");
+        printf("\t -D[x] --debug=[x]\tenable log. optional verbosity [1 .. 2] (default: 1)\n");
         return(opt_exit_success);
       case 'v':
         printf("%s\n", progname);
@@ -130,8 +132,11 @@ int process_options(int argc, char *argv[]) {
       case 'a':
         menuanimation = atoi(optarg);
         break;
-      case 'D':
+      case 'M':
         dump = 1;
+        break;
+      case 'D':
+        debug = optarg ? atoi(optarg) : 1;
         break;
       default:
         printf("usage: %s [options]\n", argv[0]);
@@ -181,7 +186,7 @@ int main(int argc, char *argv[]) {
   if (menutimeout != 0)
     signal(SIGALRM, sigalarm_handler);
 
-  if (lirc_init("animenu", daemonise ? 0 : 1) == -1)
+  if (lirc_init("animenu", debug) == -1)
     exit(EXIT_FAILURE);
 
   if (lirc_readconfig(optind != argc ? argv[optind] : NULL, &config, NULL) == 0) {
@@ -214,11 +219,13 @@ int main(int argc, char *argv[]) {
                 currentmenu = NULL;
               } else {
                 rootmenu->show(rootmenu);
-//                printf("root | current item: '%s'\n",
-//                       rootmenu->currentitem ? rootmenu->currentitem->title : "NULL");
+                if (debug > 0)
+                  printf("root | current item: '%s'\n",
+                         rootmenu->currentitem ? rootmenu->currentitem->title : "NULL");
                 rootmenu->next(rootmenu);
-//                printf("root | current item: '%s'\n",
-//                       rootmenu->currentitem ? rootmenu->currentitem->title : "NULL");
+                if (debug > 0)
+                  printf("root | current item: '%s'\n",
+                         rootmenu->currentitem ? rootmenu->currentitem->title : "NULL");
                 /* navigate based on currentmenu */
                 currentmenu = rootmenu;
               }
@@ -250,7 +257,8 @@ int main(int argc, char *argv[]) {
                   currentmenu = currentmenu->currentitem->submenu;
                   if (strstr(currentmenu->currentitem->title, playall) != 0)
                     currentmenu->next(currentmenu);
-//                  printf("current item: '%s'\n", currentmenu->currentitem->title);
+                  if (debug > 0)
+                    printf("current item: '%s'\n", currentmenu->currentitem->title);
                 }
               }
               break;

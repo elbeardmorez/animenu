@@ -31,6 +31,7 @@
 #define _strncat(A,B,C) strncat(A,B,C), *(A+(C)-1)='\0'
 
 /* globals */
+int debug = 0;
 const char *playall = "| play all |";
 
 static void animenuitem_dispose(struct animenuitem *mi);
