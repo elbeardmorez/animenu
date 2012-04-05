@@ -402,7 +402,7 @@ int animenu_genosd(struct animenucontext *menu) {
   return(result);
 }
 
-int regexcmp(const char *s1, const char *s2) {
+int rx_compare(const char *s1, const char *s2) {
   regex_t *usrflt_regex = NULL;
   int regex_errcode = REG_NOMATCH;
 
@@ -414,6 +414,31 @@ int regexcmp(const char *s1, const char *s2) {
   if (usrflt_regex)
     free(usrflt_regex);
   return regex_errcode;
+}
+
+char *rx_start(char *s, char **first) {
+  char *s2, *m, *m2;
+  char rx[] = "*.[]()|^$?+";
+  char rxc[2];
+  s2 = strdup(s);
+  int l = 0;
+  while (l < strlen(rx) - 1) {
+    sprintf(rxc, "\\%c", rx[l]);
+    /* locate first occurence of rx char and if it's not
+     * prefixed with '\', truncate the buffer */
+    while (m = strstr(s2, rxc + 1)) {
+      m2 = strstr(s2, rxc);
+      if (m && (!m2 || (m2 && m2 + 1 != m)))
+        *m = '\0';
+    }
+    l++;
+  }
+  if (strlen(s2) != strlen(s))
+    *first = s + strlen(s2) + 1;
+  else
+    *first = NULL;
+  free(s2);
+  return(*first);
 }
 
 /* set browse content */
@@ -434,19 +459,31 @@ int animenu_browse(struct animenuitem *mi) {
   char cur[PATH_MAX + 1], *all_cmd, *title, path[PATH_MAX + 1];
   unsigned int size;
 
-  if (mi->regex == NULL || *mi->regex != '/')
-    return(FALSE);
-  if (!mi->path) {
-    _strncpy(path, mi->regex, PATH_MAX);
-    /* return pointer to last occurence of char in array
-     * use pointer to terminate the string */
-    *strrchr(path, '/') = '\0';
-  } else
+  if (mi->path)
     /* path already set, so use that */
     _strncpy(path, mi->path, PATH_MAX);
+  else {
+    if (mi->regex == NULL) {
+      fprintf(stderr, "empty path");
+      return(FALSE);
+    } else if (*mi->regex != '/') {
+      fprintf(stderr, "invalid path '%s', ensure it is fully qualified", mi->regex);
+      return(FALSE);
+    }
+    /* set base path */
+    _strncpy(path, mi->regex, PATH_MAX);
+    char *rxs;
+    if (rx_start(path, &rxs))
+      *rxs = '\0';
+    /* return pointer to last occurence of char in array
+     * and use this to terminate the string */
+    *strrchr(path, '/') = '\0';
+  }
 
-  if (!(d = opendir(path)))
+  if (!(d = opendir(path))) {
+    fprintf(stderr, "invalid path '%s'", path);
     return(FALSE);
+  }
   /* fail if we can't allocate enough memory for the menu struct (known size) */
   if (!(menu = malloc(sizeof(struct animenucontext))))
     return(FALSE);
@@ -475,14 +512,13 @@ int animenu_browse(struct animenuitem *mi) {
 
     if (stat(cur, &statbuf) != -1) {
       if (S_ISREG(statbuf.st_mode)) {
-        if (!regexcmp(cur, mi->regex)) {
+        if (!rx_compare(cur, mi->regex)) {
           /* match the regex path */
           if (!(file_cur = malloc(sizeof(struct files))))
             continue;
           if (file_root == NULL)
             file_root = file_cur;
           else
-            /* one following line only using this control syntax */
             file_prev->next = file_cur;
 
           /* copy the path into the file struct's file variable */
@@ -533,24 +569,17 @@ int animenu_browse(struct animenuitem *mi) {
     mi2 = animenuitem_create(menu);
     mi2->setitem(mi2, animenuitem_command, (char*)playall, NULL, NULL, all_cmd, 0);
     for (file_cur = file_root; file_cur != NULL; file_cur = file_cur->next) {
-      mi2 = animenuitem_create(menu);
-      /* command */
-      snprintf(all_cmd, size, "%s \"%s\"", mi->command, file_cur->file);
-      /* title */
       title = strrchr(file_cur->file, '/');
-      /* type */
       stat(file_cur->file, &statbuf);
-      if (S_ISREG(statbuf.st_mode))
-        /* set basic command item */
+      if (S_ISREG(statbuf.st_mode)) {
+        /* create command item */
+        mi2 = animenuitem_create(menu);
+        snprintf(all_cmd, size, "%s \"%s\"", mi->command, file_cur->file);
         mi2->setitem(mi2, animenuitem_command, ++title, NULL, NULL, all_cmd, 0);
-      else if (S_ISDIR(statbuf.st_mode) || S_ISLNK(statbuf.st_mode)) {
-        /* ammended regex for further wildcard browse menus */
-        char regexbuf[PATH_MAX + 1];
-        strncpy(regexbuf, file_cur->file, PATH_MAX + 1);
-        strncpy(regexbuf, strrchr(mi->regex,'/'), PATH_MAX + 1 - strlen(file_cur->file));
-
-        /* set browse (menu) item */
-        mi2->setitem(mi2, animenuitem_browse, title, file_cur->file, regexbuf, mi->command, mi->recurse);
+      } else if (S_ISDIR(statbuf.st_mode) || S_ISLNK(statbuf.st_mode)) {
+        /* create submenu item */
+        mi2 = animenuitem_create(menu);
+        mi2->setitem(mi2, animenuitem_browse, title, file_cur->file, mi->regex, mi->command, mi->recurse);
       }
     }
   }
