@@ -209,7 +209,9 @@ int main(int argc, char *argv[]) {
         continue;
       while ((ret = lirc_code2char(config, code, &c)) == 0 && c != NULL) {
         struct easyoption *opt = parseoption(myoptions, c);
-        if (opt) {
+        if (!opt)
+          fprintf(stderr, "command not recognised: %s\n", c);
+        else {
           if (menutimeout != 0)
             alarm(0);
           switch (opt->id) {
@@ -269,16 +271,17 @@ int main(int argc, char *argv[]) {
             alarm_pending = 1;
             alarm(menutimeout);
           }
-        } else
-          fprintf(stderr, "command not recognised: %s\n", c);
-      }
+        } /* valid command */
+      } /* while code2char */
       free(code);
       if (ret == -1)
         break;
-    }
-    lirc_freeconfig(config);
-  }
+    } /* while waiting for next lirc code */
 
+    lirc_freeconfig(config);
+  } /* config read */
+
+  /* close lirc connection */
   lirc_deinit();
 
   exit(EXIT_SUCCESS);
