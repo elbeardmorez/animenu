@@ -18,8 +18,6 @@
 -overlapping menu nesting
 -menu headers
 -item padding add menu pointer
--remove rigid 3 line menu configuration structure
--allow comments in menu file
 
 # long term
 -real transparency

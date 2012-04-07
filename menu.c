@@ -29,6 +29,7 @@
 
 #define _strncpy(A,B,C) strncpy(A,B,C), *(A+(C)-1)='\0'
 #define _strncat(A,B,C) strncat(A,B,C), *(A+(C)-1)='\0'
+#define _max(A,B) A>B?A:B
 
 /* globals */
 int debug = 0;
@@ -49,7 +50,7 @@ static void animenu_show(struct animenucontext *menu);
 static void animenu_hideframe(struct animenucontext *menu, int frame);
 static void animenu_hide(struct animenucontext *menu);
 static char *animenu_stripwhitespace(char *string);
-static int animenu_readtriple(FILE *f, char *typebuf, char *titlebuf, char *cmdbuf);
+static int animenu_readmenufile(FILE *f, char ***item);
 void *animenu_idcallback(void *ud, struct osditemdata **osdid);
 int animenu_genosd(struct animenucontext *menu);
 void animenu_dump(struct animenucontext *menu);
@@ -344,24 +345,87 @@ static char *animenu_stripwhitespace(char *str) {
   return str;
 }
 
-static int animenu_readtriple(FILE *f, char *typebuf, char *titlebuf, char *cmdbuf) {
-  do {
-    if (!(fgets(typebuf, 256, f)))
-      return(FALSE);
-  } while (strlen(typebuf) < 2);
-  typebuf[strlen(typebuf) - 1] = 0;
+/* read a structure with controlled by whitespace/indentation */
+#define _freecfg(A) free((void*)A[0]),free((void*)A)
+static int animenu_readmenufile(FILE *f, char ***item) {
 
-  do {
-    if (!(fgets(titlebuf, 256, f)))
-      return(FALSE);
-  } while (strlen(titlebuf) < 2);
-  titlebuf[strlen(titlebuf) - 1] = 0;
+  /* append valid lines to a dynamic buff buffer, determining the
+   * max length and number of lines for the current config item.
+   * allocate memory and then split when hitting the next item or eof
+   * caller must free the memory allocation, and can use _freecfg
+   */
 
+  int i;
+  int idx = 0; /* item index */
+  int maxlen = 0; /* max length seen */
+  int maxlenline = PATH_MAX + 1; /* max line length */
+  int len;
+  char s[maxlenline];
+  char *s2;
+  char *b = malloc(maxlenline); /* flattened item buffer */
+  char rx_comment[] = "^\\s*#.*";
+  char rx_empty[] = "^\\s*$";
+  char rx_nested[] = "^\\s+.*";
+
+  /* read item to buffer*/
+  b[0] = '\0';
   do {
-    if (!(fgets(cmdbuf, 256, f)))
-      return(FALSE);
-  } while (strlen(cmdbuf) < 2);
-  cmdbuf[strlen(cmdbuf) - 1] = 0;
+    s[0] = '\0';
+    if (!(fgets(s, maxlenline - 1, f))) {
+      /* eof */
+      if (idx > 0)
+        /* process final item */
+        break;
+      else {
+        /* nothing left to read */
+        free(b);
+        return(FALSE);
+      }
+    }
+    if (rx_compare(s, &rx_empty) == 0 ||
+        rx_compare(s, &rx_comment) == 0)
+      continue;
+    if (rx_compare(s, &rx_nested) != 0) {
+      if (idx > 0) {
+        fseek(f, -strlen(s), SEEK_CUR);
+        break;
+      }
+    }
+    s2 = animenu_stripwhitespace(s);
+    len = strlen(s2);
+    maxlen = _max(len, maxlen);
+    if (idx == 0) {
+      /* force lower case 'type' */
+      for (i = 0; b[i]; i++)
+        b[i] = tolower(b[i]);
+    }
+    if (strlen(s) + len + 1 > sizeof(s)) {
+      /* enlarge buffer */
+      char *b2 = strdup(b);
+      b = realloc(b, sizeof(b) + maxlenline);
+      strcpy(b, b2);
+      free(b2);
+    }
+    sprintf(b + strlen(b), "%s\n", s2);
+    idx++;
+  } while (1);
+
+  /* create item from flat buffer */
+  (*item) = malloc(idx * sizeof(char*));
+  (*item)[0] = malloc(idx * (maxlen + 1) * sizeof(char));
+  int pos = 0;
+  char *n = NULL;
+  if (debug > 0)
+    fprintf(stderr, "parsed config item:\n");
+  for (i = 0; pos < strlen(b); i++) {
+    (*item)[i] = (*item)[0] + i * (maxlen + 1);
+    n = strchr(b + pos, '\n');
+    _strncpy((*item)[i], b + pos, n - (b + pos) + 1);
+    pos += n - (b + pos) + 1;
+    if (debug > 0)
+      fprintf(stderr, "[%d] %s\n", i, (*item)[i]);
+  }
+  free(b);
 
   return(TRUE);
 }
@@ -601,6 +665,7 @@ struct animenucontext *animenu_create(struct animenucontext *parent, enum animen
   struct animenucontext *menu;
   FILE *f;
   struct stat statbuf;
+  char **itemcfg;
   char typebuf[256];
   char titlebuf[256];
   char cmdbuf[256];
@@ -629,7 +694,10 @@ struct animenucontext *animenu_create(struct animenucontext *parent, enum animen
   }
 
   if (type == animenuitem_submenu) {
-    while (animenu_readtriple(f, typebuf, titlebuf, cmdbuf)) {
+    while (animenu_readmenufile(f, &itemcfg)) {
+      _strncpy(typebuf, itemcfg[0], strlen(itemcfg[0]) + 1);
+      _strncpy(titlebuf, itemcfg[1], strlen(itemcfg[1]) + 1);
+      _strncpy(cmdbuf, itemcfg[2], strlen(itemcfg[2]) + 1);
       /* create an item and adds it to the menu */
       struct animenuitem *item = animenuitem_create(menu);
 
@@ -666,6 +734,8 @@ struct animenucontext *animenu_create(struct animenucontext *parent, enum animen
         item->dispose(item);
         fprintf(stderr, "cannot create submenu\n");
       }
+      /* clean up config item */
+      _freecfg(itemcfg);
     } /* end while */
     fclose(f);
   } else
