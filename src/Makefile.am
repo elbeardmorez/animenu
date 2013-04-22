@@ -1,18 +1,21 @@
 ## Process this file with automake to produce Makefile.in
 
+@include@
+
 bin_PROGRAMS = animenu
 
 ## simple programs
 animenu_SOURCES = animenu.c animenu.h tokenize.c tokenize.h osd.c osd.h menu.c menu.h options.c options.h
 
-animenu_LDADD = -lX11
+animenu_LDADD = $(LIBS)
 
 EXTRA_DIST = \
-  examplemenus/animenurc \
-  examplemenus/root.menu \
-  examplemenus/emulators.menu \
-  examplemenus/graphics.menu \
-  examplemenus/sound.menu \
-  examplemenus/internet.menu
+  examples/animenurc \
+  examples/root.menu \
+  examples/emulators.menu \
+  examples/graphics.menu \
+  examples/sound.menu \
+  examples/internet.menu
 
 CLEANFILES = *~
+

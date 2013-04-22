@@ -1,6 +1,5 @@
 
 # short term
--autoconf/make recursive build
 -refactor variable names
 -update license information and headers
 -fix segfault on empty folders
