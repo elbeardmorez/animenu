@@ -1,8 +1,6 @@
 
 # short term
--re-structure files, mv source to src, rename examples folder
 -autoconf/make recursive build
--remove old build files
 -refactor variable names
 -update license information and headers
 -fix segfault on empty folders
