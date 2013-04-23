@@ -1,9 +1,12 @@
 
-/* Menu.c - part of the animenu package, which is copyright (c) 2001
- * by Alastair M. Robinson.
+/**
+ * animenu - lirc menu system
  *
- * This program is released under the terms of the GNU Public License,
- * version 2 or later.  See the file 'COPYING' for more details.
+ *  copyright (c) 2009, 2012-2013 by Pete Beardmore <pete.beardmore@msn.com>
+ *  copyright (c) 2001-2003 by Alastair M. Robinson <blackfive@fakenhamweb.co.uk>
+ *
+ *  licensed under GNU General Public License 2.0 or later
+ *  some rights reserved. see COPYING, AUTHORS
  */
 
 #include <stdio.h>

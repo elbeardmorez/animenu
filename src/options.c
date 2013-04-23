@@ -1,18 +1,20 @@
 
-/****************************************************************************
- * options.c                                                                *
- * By Massimo Maricchiolo <mmaricch@yahoo.com>                              *
- *                                                                          *
- * Simplified by Alastair M. Robinson                                       *
- *                                                                          *
- ****************************************************************************/
+/**
+ * animenu - lirc menu system
+ *
+ *  copyright (c) 2009, 2012-2013 by Pete Beardmore <pete.beardmore@msn.com>
+ *  copyright (c) 2002 by Massimo Maricchiolo <mmaricch@yahoo.com>
+ *  copyright (c) 2001-2003 by Alastair M. Robinson <blackfive@fakenhamweb.co.uk>
+ *
+ *  licensed under GNU General Public License 2.0 or later
+ *  some rights reserved. see COPYING, AUTHORS
+ */
 
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "animenu.h"
-
 #include "options.h"
 
 char rc_fontspec[256];

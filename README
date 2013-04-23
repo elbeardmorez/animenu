@@ -14,12 +14,12 @@ uses the Xft extension for (pseudo) translucency
 #########
 # history
 
-this project was created by Alastair M. Robinson between 2001-2003, where it
-reached release version 0.3 with work from several contributors. it was
+this project was created by Alastair M. Robinson between 2001-2003, where
+it reached release version 0.3 with work from several contributors. it was
 inspired by 'osdmenu' (Toby Jaffey) but with the original of goal of being
 more visually impressive. it bases its OSD code (very loosely) on 'wmix'
-(timecop). with no work seen for 10 years, the project was cloned and
-re-worked by Pete Beardmore. refer to the ChangeLog file for details
+(Tim Copperfield). with no work seen for 10 years, the project was cloned
+and re-worked by Pete Beardmore. refer to the ChangeLog file for details
 
 #########
 # licence

@@ -1,7 +1,6 @@
 
 # short term
 -refactor variable names
--update license information and headers
 -fix segfault on empty folders
 -fix various failing regexp based browse menus
 -fix logic errors in options.c
