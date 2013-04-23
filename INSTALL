@@ -1,10 +1,17 @@
 
-like much open source Linux software, animenu is distributed as source. to
-build and install it, execute the following standard commands from a console:
+like much open source Linux software, animenu is distributed as source.
+to build and install, it should suffice to execute the following standard
+commands:
 
   ./configure
-  make
   make install
+
+issues with incompatible build tools/macros/scripts 'may' be fixed by
+regeneration of configure and Makefile*.in files via use of:
+
+  ./bootstrap
+
+the above assumes a fully functional gnu build system
 
 the following options exist for customising animenu at the configure stage:
 
@@ -14,7 +21,8 @@ the following options exist for customising animenu at the configure stage:
   disable use of xpm library for icons
     --disable-icons [default: system]
 
-having installed animenu, you need to adjust your '.lircrc' file to use any
-of the supported animenu commands (see README file for details), and as a
-minimum create a root.menu file (see README file for details)
+having installed animenu, you need to adjust your '.lircrc' file to use
+any of animenu's supported lirc commands, and also create the entry-
+point menu file ('root.menu') as a bare minimum. refer to README file
+for further details
 

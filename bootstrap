@@ -1,0 +1,13 @@
+#!/bin/sh
+
+prgnam=animenu
+target=/usr/local
+
+echo -e '\n# bootstrapping build files, installing macros etc.\n'
+autoreconf --install --verbose || exit 
+echo -e '\n# testing system and configuring build tools\n'
+[ -f ./configure ] && ./configure --prefix=$target $@ || exit
+echo -e "
+# run 'make' to build the '$prgnam' binary and push it to './bin'
+# run 'make install' to build the '$prgnam' binary and push it to '$target/bin'\n"
+
