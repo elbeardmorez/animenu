@@ -172,7 +172,7 @@ int main(int argc, char *argv[]) {
       break;
   }
   if (menutimeout < 0 || menuanimation < 0) {
-    fprintf(stderr, "menutimeout and menuanimation must be >= 0.\n");
+    fprintf(stderr, "menutimeout and menuanimation must be >= 0\n");
     return(EXIT_FAILURE);
   }
 

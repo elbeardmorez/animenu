@@ -16,9 +16,9 @@
 
 #include "options.h"
 
-char rc_fontspec[256];
-char rc_color[256];
-char rc_selcolor[256];
+char rc_fontspec[BUFSIZE + 1];
+char rc_color[BUFSIZE + 1];
+char rc_selcolor[BUFSIZE + 1];
 
 char *makefontspec(char *fontname, char *fontsize) {
   rc_fontspec[0] = 0;
@@ -34,7 +34,7 @@ char *makefontspec(char *fontname, char *fontsize) {
 }
 
 int read_config() {
-  char buff[1024];
+  char buff[BUFSIZE + 1];
   char *tmp, *key, *val, *val1, *rr, *c, *c1;
   int len, pos, i;
   FILE *f;

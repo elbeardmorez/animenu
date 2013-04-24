@@ -23,6 +23,8 @@
 #endif
 
 /* globals */
+#define BUFSIZE 1024
+
 extern char *fontname;
 extern char *fgcolor, *bgcolor, *selectfgcolor;
 extern int menutimeout, menuanimation;

@@ -17,9 +17,9 @@
 #include "animenu.h"
 #endif
 
-extern char rc_fontspec[256];
-extern char rc_color[256];
-extern char rc_selcolor[256];
+extern char rc_fontspec[BUFSIZE + 1];
+extern char rc_color[BUFSIZE + 1];
+extern char rc_selcolor[BUFSIZE + 1];
 
 char *makefontspec(char *font, char *size);
 int read_config();

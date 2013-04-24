@@ -14,7 +14,6 @@
 #include <string.h>
 #include <pthread.h>
 #include <regex.h>
-#include <limits.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -95,8 +94,8 @@ static int animenuitem_setitem(struct animenuitem *mi, enum animenuitem_type typ
   mi->submenu = NULL;
 
   if (type == animenuitem_browse) {
-    mi->regex = malloc(PATH_MAX + 1);
-    strncpy(mi->regex, regex, PATH_MAX + 1);
+    mi->regex = malloc(BUFSIZE + 1);
+    strncpy(mi->regex, regex, BUFSIZE + 1);
   }
   mi->recurse = recurse;
 
@@ -350,7 +349,7 @@ static int animenu_readmenufile(FILE *f, char ***item) {
   int i;
   int idx = 0; /* item index */
   int maxlen = 0; /* max length seen */
-  int maxlenline = PATH_MAX + 1; /* max line length */
+  int maxlenline = BUFSIZE + 1; /* max line length */
   int len;
   char s[maxlenline];
   char *s2;
@@ -502,7 +501,7 @@ int animenu_browse(struct animenuitem *mi) {
   int success = TRUE;
 
   struct files {
-    char file[PATH_MAX + 1];
+    char file[BUFSIZE + 1];
     struct files *next;
   } *file_cur, *file_root = NULL, *file_prev = NULL;
 
@@ -512,12 +511,12 @@ int animenu_browse(struct animenuitem *mi) {
   struct stat statbuf;
   struct dirent *dirent;
   /* note that the regexp is not kept seperately */
-  char cur[PATH_MAX + 1], *all_cmd, *title, path[PATH_MAX + 1];
+  char cur[BUFSIZE + 1], *all_cmd, *title, path[BUFSIZE + 1];
   unsigned int size;
 
   if (mi->path)
     /* path already set, so use that */
-    _strncpy(path, mi->path, PATH_MAX);
+    _strncpy(path, mi->path, BUFSIZE + 1);
   else {
     if (mi->regex == NULL) {
       fprintf(stderr, "empty path");
@@ -527,7 +526,7 @@ int animenu_browse(struct animenuitem *mi) {
       return(FALSE);
     }
     /* set base path */
-    _strncpy(path, mi->regex, PATH_MAX);
+    _strncpy(path, mi->regex, BUFSIZE + 1);
     char *rxs;
     if (rx_start(path, &rxs))
       *rxs = '\0';
@@ -564,7 +563,7 @@ int animenu_browse(struct animenuitem *mi) {
       continue;
 
     /* set 'cur' as the current full path for consideration */
-    snprintf(cur, PATH_MAX, "%s/%s", path, dirent->d_name);
+    snprintf(cur, BUFSIZE + 1, "%s/%s", path, dirent->d_name);
 
     if (stat(cur, &statbuf) != -1) {
       if (S_ISREG(statbuf.st_mode)) {
@@ -578,7 +577,7 @@ int animenu_browse(struct animenuitem *mi) {
             file_prev->next = file_cur;
 
           /* copy the path into the file struct's file variable */
-          _strncpy(file_cur->file, cur, PATH_MAX);
+          _strncpy(file_cur->file, cur, BUFSIZE + 1);
           file_cur->next = NULL;
           file_prev = file_cur;
         }
@@ -594,7 +593,7 @@ int animenu_browse(struct animenuitem *mi) {
           else
             file_prev->next = file_cur;
           /* copy the path into our struct's file variable */
-          _strncpy(file_cur->file, cur, PATH_MAX);
+          _strncpy(file_cur->file, cur, BUFSIZE + 1);
           file_cur->next = NULL;
           file_prev = file_cur;
         }
@@ -653,15 +652,15 @@ int animenu_browse(struct animenuitem *mi) {
 }
 
 struct animenucontext *animenu_create(struct animenucontext *parent, enum animenuitem_type type, const char *filename) {
-  char file[PATH_MAX + 1] = "";
+  char file[BUFSIZE + 1] = "";
   struct animenucontext *menu;
   FILE *f;
   struct stat statbuf;
   char **itemcfg;
-  char typebuf[256];
-  char titlebuf[256];
-  char cmdbuf[256];
-  char regexbuf[PATH_MAX + 1];
+  char typebuf[BUFSIZE + 1];
+  char titlebuf[BUFSIZE + 1];
+  char cmdbuf[BUFSIZE + 1];
+  char regexbuf[BUFSIZE + 1];
 
   if (!(menu = malloc(sizeof(struct animenucontext))))
     return(NULL);
@@ -699,7 +698,7 @@ struct animenucontext *animenu_create(struct animenucontext *parent, enum animen
                        NULL, NULL, animenu_stripwhitespace(cmdbuf), 0);
       else if (strcasecmp(animenu_stripwhitespace(typebuf), "menu") == 0) {
         /* set up a submenu */
-        snprintf(file, PATH_MAX, "%s/.animenu/%s", getenv("HOME"), animenu_stripwhitespace(cmdbuf));
+        snprintf(file, BUFSIZE + 1, "%s/.animenu/%s", getenv("HOME"), animenu_stripwhitespace(cmdbuf));
         struct animenucontext *submenu;
         if (submenu = animenu_create(menu, animenuitem_submenu, file))
           item->setsubmenu(item, animenu_stripwhitespace(titlebuf), submenu);
