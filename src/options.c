@@ -117,12 +117,12 @@ int read_config() {
     }
   }
 
-  if (rc_fontspec[0]) ;
-  fontname = rc_fontspec;
-  if (rc_color[0]) ;
-  fgcolor = rc_color;
-  if (rc_selcolor[0]) ;
-  selectfgcolor = rc_selcolor;
+  if (rc_fontspec[0])
+    fontname = rc_fontspec;
+  if (rc_color[0])
+    fgcolor = rc_color;
+  if (rc_selcolor[0])
+    selectfgcolor = rc_selcolor;
 
   fclose(f);
 
