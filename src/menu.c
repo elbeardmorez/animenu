@@ -23,17 +23,6 @@
 
 #include "menu.h"
 
-#ifndef FALSE
-#define FALSE 0
-#endif
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#define _strncpy(A,B,C) strncpy(A,B,C), *(A+(C)-1)='\0'
-#define _strncat(A,B,C) strncat(A,B,C), *(A+(C)-1)='\0'
-#define _max(A,B) A>B?A:B
-
 /* globals */
 int debug = 0;
 const char *playall = "| play all |";

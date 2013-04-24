@@ -13,6 +13,10 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
+#ifndef ANIMENU_H
+#include "animenu.h"
+#endif
+
 extern char rc_fontspec[256];
 extern char rc_color[256];
 extern char rc_selcolor[256];

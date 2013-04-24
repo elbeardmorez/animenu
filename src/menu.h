@@ -9,9 +9,12 @@
  *  some rights reserved. see COPYING, AUTHORS
  */
 
-#ifndef animenuCONTEXT_H
-#define animenuCONTEXT_H
+#ifndef ANIMENU_MENU_H
+#define ANIMENU_MENU_H
 
+#ifndef ANIMENU_H
+#include "animenu.h"
+#endif
 #include "osd.h"
 
 /* globals */

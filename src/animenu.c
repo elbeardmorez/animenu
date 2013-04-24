@@ -24,6 +24,7 @@
 #include <limits.h>
 #include <lirc/lirc_client.h>
 
+#include "animenu.h"
 #include "tokenize.h"
 #include "osd.h"
 #include "menu.h"

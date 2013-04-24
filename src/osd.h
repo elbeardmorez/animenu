@@ -12,6 +12,10 @@
 #ifndef IRMIX_OSD_H
 #define IRMIX_OSD_H
 
+#ifndef ANIMENU_H
+#include "animenu.h"
+#endif
+
 #define OSD_MAXANIMFRAME 2000
 
 struct osditemdata {

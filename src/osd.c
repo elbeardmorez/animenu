@@ -35,8 +35,6 @@
 #include <X11/Xft/Xft.h>
 #endif /* HAVE_LIBXFT */
 
-#include "animenu.h"
-
 #include "osd.h"
 
 extern int menuanimation;

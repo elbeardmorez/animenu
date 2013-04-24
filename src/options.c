@@ -14,7 +14,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "animenu.h"
 #include "options.h"
 
 char rc_fontspec[256];
