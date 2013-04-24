@@ -7,11 +7,11 @@ SUBDIRS = src
 
 all-dist: all
 	@echo "installing '$(pkgnam)' to './bin' dir"
-	@[ ! -d ./bin ] && mkdir ./bin
+	@test -d ./bin || mkdir ./bin
 	@mv ./src/$(pkgnam) ./bin
 
 clean-local:
-	[ -d ./bin ] && rm -rf ./bin
+	test -d ./bin && rm -rf ./bin || true
 
 .PHONY: all-dist
 
