@@ -15,6 +15,9 @@
 #ifndef ANIMENU_H
 #include "animenu.h"
 #endif
+#ifndef OPTIONS_H
+#include "options.h"
+#endif
 
 #define OSD_MAXANIMFRAME 2000
 
@@ -25,11 +28,11 @@ struct osditemdata {
 };
 
 struct osdcontext {
-  void (*dispose) (struct osdcontext *osd);
-  void (*show) (struct osdcontext *osd);
+  void (*dispose) (struct osdcontext *osd, int menuanimation);
+  void (*show) (struct osdcontext *osd, int menuanimation);
   void (*showframe) (struct osdcontext *osd, int frame);
   void (*showselected) (struct osdcontext *osd, int selected);
-  void (*hide) (struct osdcontext *osd);
+  void (*hide) (struct osdcontext *osd, int menuanimation);
   void (*hideframe) (struct osdcontext *osd, int frame);
   void (*setstringcallback) (struct osdcontext *osd,
                              void *(*stringcallback) (void *userdata, struct osditemdata **osdid),

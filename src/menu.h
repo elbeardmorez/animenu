@@ -36,6 +36,7 @@ struct animenucontext {
   struct animenuitem *currentitem;
   struct animenucontext *parent;
   struct osdcontext *osd;
+  int menuanimation;
   int visible;
 };
 

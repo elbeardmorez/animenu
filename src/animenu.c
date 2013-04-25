@@ -20,21 +20,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <getopt.h>
 #include <limits.h>
 #include <lirc/lirc_client.h>
 
 #include "animenu.h"
-#include "tokenize.h"
 #include "osd.h"
 #include "menu.h"
 #include "options.h"
 
-char *progname = PACKAGE "-" VERSION;
 
-enum myids {id_null, id_show, id_next, id_prev, id_select, id_back, id_forward};
+enum command_ids {id_null, id_show, id_next, id_prev, id_select, id_back, id_forward};
 
-struct easyoption myoptions[] = {
+struct lirc_command {
+  int id;
+  const char *name;
+  int args, argsread;
+  int value1, value2, value3;
+};
+struct lirc_command lirc_commands[] = {
   {id_show, "show", 0, 0, 0, 0, 0},
   {id_next, "next", 0, 0, 0, 0, 0},
   {id_prev, "prev", 0, 0, 0, 0, 0},
@@ -44,18 +47,11 @@ struct easyoption myoptions[] = {
   {0, NULL, 0, 0, 0, 0, 0}
 };
 
-enum optresults {opt_null, opt_daemonise, opt_exit_failure, opt_exit_success};
-
 /* globals */
 static long osd_utime;
 static struct animenucontext *rootmenu;
 static struct animenucontext *currentmenu;
 static int alarm_pending;
-char *fontname = "-misc-fixed-medium-r-normal--36-*-75-75-c-*-iso8859-*";
-char *fgcolor = "rgb:00/ff/00", *bgcolor = "black", *selectfgcolor = "rgb:bf/ff/bf";
-
-int menutimeout = 5, menuanimation = 10000;
-int dump = 0;
 
 void sigalarm_handler(int junk) {
   if (alarm_pending) {
@@ -64,114 +60,46 @@ void sigalarm_handler(int junk) {
   }
 }
 
-int process_options(int argc, char *argv[]) {
-  int daemonise = 0;
-  read_config();
-
-  while (1) {
-    int c;
-    static struct option long_options[] = {
-      {"help", no_argument, NULL, 'h'},
-      {"version", no_argument, NULL, 'v'},
-      {"daemon", no_argument, NULL, 'd'},
-      {"font", required_argument, NULL, 'f'},
-      {"fontname", required_argument, NULL, 'n'},
-      {"fgcolor", required_argument, NULL, 'c'},
-/*
-      {"bgcolor",required_argument,NULL,'b'},
-*/
-      {"selectfgcolor", required_argument, NULL, 's'},
-      {"menutimeout", required_argument, NULL, 't'},
-      {"menuanimation", required_argument, NULL, 'a'},
-      {"dump", no_argument, NULL, 'M'},
-      {"debug", optional_argument, NULL, 'D'},
-      {0, 0, 0, 0}
-    };
-    c = getopt_long(argc, argv, "hvdf:n:c:s:t:a:M:D::", long_options, NULL);
-    if (c == -1)
-      break;
-    switch (c) {
-      case 'h':
-        printf("usage: %s [options]\n", argv[0]);
-        printf("\t -h --help\t\tdisplay this message\n");
-        printf("\t -v --version\t\tdisplay version\n");
-        printf("\t -d --daemon\t\trun in background\n");
-        printf("\t -f --font\t\tuse specified font (xfontsel format)\n");
-        printf("\t -n --fontname\t\tspecify font by family name only\n");
-        printf("\t -c --fgcolor\t\tuse specified foreground color\n");
-/*
-        printf("\t -b --bgcolor\t\tuse specified background color\n");
-*/
-        printf("\t -s --selectfgcolor\t\tcolor of selected item\n");
-        printf("\t -t --menutimeout\t\thow long before menu dissapears (0 for no timeout)\n");
-        printf("\t -a --menuanimation\t\tmenu animation speed (microseconds)\n");
-        printf("\t -M --dump\t\tdump menu structure to screen\n");
-        printf("\t -D[x] --debug=[x]\tenable log. optional verbosity [1 .. 2] (default: 1)\n");
-        return(opt_exit_success);
-      case 'v':
-        printf("%s\n", progname);
-        return(opt_exit_success);
-      case 'd':
-        daemonise = 1;
-        break;
-      case 'f':
-        fontname = strdup(optarg);
-        break;
-      case 'n':
-        fontname = makefontspec(optarg, "36");
-        break;
-      case 'c':
-        fgcolor = strdup(optarg);
-        break;
-/*
-      case 'b':
-        bgcolor = strdup(optarg);
-        break;
-*/
-      case 's':
-        selectfgcolor = strdup(optarg);
-        break;
-      case 't':
-        menutimeout = atoi(optarg);
-        break;
-      case 'a':
-        menuanimation = atoi(optarg);
-        break;
-      case 'M':
-        dump = 1;
-        break;
-      case 'D':
-        debug = optarg ? atoi(optarg) : 1;
-        break;
-      default:
-        printf("usage: %s [options]\n", argv[0]);
-        return(opt_exit_failure);
+struct lirc_command * parse_codes(struct lirc_command* cmds, const char *cmd) {
+  struct lirc_command *c = NULL;
+  char cmdpart[32];
+  int i;
+  if (strlen(cmd) > 31) {
+    printf("error: lirc code line too long\n");
+    return(NULL);
+  }
+  if (1 == sscanf(cmd, "%s", cmdpart)) {
+    i = 0;
+    while (cmds[i].name) {
+      if (0 == strcasecmp(cmds[i].name, cmdpart)) {
+        c = &cmds[i];
+        c->value1 = c->value2 = c->value3 = 0;
+        c->argsread = sscanf(cmd, "%*s %d %d %d", &c->value1, &c->value2, &c->value3);
+        return (c);
+      }
+      ++i;
     }
-  }
-  if (optind < argc - 1) {
-    fprintf(stderr, "%s: too many arguments\n", progname);
-    return(opt_exit_failure);
-  }
-  return((daemonise ? opt_daemonise : opt_null));
+  } else
+    printf("error: cannot parse lirc code line '%s'\n", cmd);
+
+  return(NULL);
 }
 
 int main(int argc, char *argv[]) {
   struct lirc_config *config;
-  int daemonise = 0;
   int currentchannel = 0;
 
   switch (process_options(argc, argv)) {
-    case opt_exit_success:
+    case option_exitsuccess:
       return(EXIT_SUCCESS);
       break;
-    case opt_exit_failure:
+    case option_exitfailure:
       return(EXIT_FAILURE);
       break;
-    case opt_daemonise:
-      daemonise = 1;
-      break;
   }
-  if (menutimeout < 0 || menuanimation < 0) {
+  struct animenu_options* options = get_options();
+
+  if (options->menutimeout < 0 || options->menuanimation < 0) {
     fprintf(stderr, "menutimeout and menuanimation must be >= 0\n");
     return(EXIT_FAILURE);
   }
@@ -182,16 +110,16 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "cannot create root menu!\n");
     return(EXIT_FAILURE);
   }
-  if (dump) {
+  if (options->dump) {
     animenu_dump(rootmenu);
     rootmenu->dispose(rootmenu);
     exit(0);
   }
 
-  if (menutimeout != 0)
+  if (options->menutimeout != 0)
     signal(SIGALRM, sigalarm_handler);
 
-  if (lirc_init("animenu", debug) == -1)
+  if (lirc_init(options->progname, options->debug) == -1)
     exit(EXIT_FAILURE);
 
   if (lirc_readconfig(optind != argc ? argv[optind] : NULL, &config, NULL) == 0) {
@@ -199,10 +127,10 @@ int main(int argc, char *argv[]) {
     char *c;
     int ret;
 
-    if (daemonise) {
+    if (options->daemonise) {
       if (daemon(0, 0) == -1) {
-        fprintf(stderr, "%s: cannot daemonise\n", progname);
-        perror(progname);
+        fprintf(stderr, "%s: can't daemonise\n", options->progname);
+        perror(options->progname);
         lirc_freeconfig(config);
         lirc_deinit();
         exit(EXIT_FAILURE);
@@ -213,24 +141,24 @@ int main(int argc, char *argv[]) {
       if (code == NULL)
         continue;
       while ((ret = lirc_code2char(config, code, &c)) == 0 && c != NULL) {
-        struct easyoption *opt = parseoption(myoptions, c);
-        if (!opt)
+        struct lirc_command * cmd = parse_codes(lirc_commands,c);
+        if (!cmd)
           fprintf(stderr, "command not recognised: %s\n", c);
         else {
-          if (menutimeout != 0)
+          if (options->menutimeout != 0)
             alarm(0);
-          switch (opt->id) {
+          switch (cmd->id) {
             case id_show:
               if (rootmenu->visible) {
                 rootmenu->hide(rootmenu);
                 currentmenu = NULL;
               } else {
                 rootmenu->show(rootmenu);
-                if (debug > 0)
+                if (options->debug > 0)
                   printf("root | current item: '%s'\n",
                          rootmenu->currentitem ? rootmenu->currentitem->title : "NULL");
                 rootmenu->next(rootmenu);
-                if (debug > 0)
+                if (options->debug > 0)
                   printf("root | current item: '%s'\n",
                          rootmenu->currentitem ? rootmenu->currentitem->title : "NULL");
                 /* navigate based on currentmenu */
@@ -264,17 +192,17 @@ int main(int argc, char *argv[]) {
                   currentmenu = currentmenu->currentitem->submenu;
                   if (strstr(currentmenu->currentitem->title, playall) != 0)
                     currentmenu->next(currentmenu);
-                  if (debug > 0)
+                  if (options->debug > 0)
                     printf("current item: '%s'\n", currentmenu->currentitem->title);
                 }
               }
               break;
           }
-          if ((opt->id == id_show) && !(rootmenu->visible))
+          if ((cmd->id == id_show) && !(rootmenu->visible))
             ; /* no-op */
-          else if (menutimeout != 0) {
+          else if (options->menutimeout != 0) {
             alarm_pending = 1;
-            alarm(menutimeout);
+            alarm(options->menutimeout);
           }
         } /* valid command */
       } /* while code2char */

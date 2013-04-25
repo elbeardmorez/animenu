@@ -17,11 +17,24 @@
 #include "animenu.h"
 #endif
 
-extern char rc_fontspec[BUFSIZE + 1];
-extern char rc_color[BUFSIZE + 1];
-extern char rc_selcolor[BUFSIZE + 1];
+enum option_results {option_null, option_daemonise, option_exitfailure, option_exitsuccess};
+struct animenu_options {
+  char progname[BUFSIZE + 1];
+  char progver[BUFSIZE + 1];
+  char fontspec[BUFSIZE + 1];
+  char fontname[BUFSIZE + 1];
+  char fontsize[BUFSIZE + 1];
+  char bgcolour[BUFSIZE + 1];
+  char fgcolour[BUFSIZE + 1];
+  char fgcoloursel[BUFSIZE + 1];
+  int menutimeout;
+  int menuanimation;
+  int daemonise;
+  int dump;
+  int debug;
+};
 
-char *makefontspec(char *font, char *size);
-int read_config();
+int process_options(int argc, char *argv[]);
+struct animenu_options* get_options();
 
 #endif

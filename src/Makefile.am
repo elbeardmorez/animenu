@@ -5,7 +5,7 @@
 bin_PROGRAMS = animenu
 
 ## simple programs
-animenu_SOURCES = animenu.c animenu.h tokenize.c tokenize.h osd.c osd.h menu.c menu.h options.c options.h
+animenu_SOURCES = animenu.c animenu.h osd.c osd.h menu.c menu.h options.c options.h
 
 animenu_LDADD = $(LIBS)
 
@@ -14,7 +14,7 @@ EXTRA_DIST = \
   examples/root.menu \
   examples/emulators.menu \
   examples/graphics.menu \
-  examples/sound.menu \
+  examples/audio.menu \
   examples/internet.menu
 
 CLEANFILES = *~

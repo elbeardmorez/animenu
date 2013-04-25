@@ -177,11 +177,9 @@ struct animenuitem *animenuitem_create(struct animenucontext *menu) {
 static void animenu_dispose(struct animenucontext *menu) {
   if (menu) {
     if (menu->osd)
-      menu->osd->dispose(menu->osd);
-
+      menu->osd->dispose(menu->osd, menu->menuanimation);
     while (menu->firstitem)
       menu->firstitem->dispose(menu->firstitem);
-
     free(menu);
   }
 }
@@ -297,7 +295,7 @@ static void animenu_show(struct animenucontext *menu) {
         menu->hide(menu);
     } else {
       menu->visible = TRUE;
-      menu->osd->show(menu->osd);
+      menu->osd->show(menu->osd, menu->menuanimation);
     }
   }
 }
@@ -318,13 +316,11 @@ static void animenu_hideframe(struct animenucontext *menu, int frame) {
   }
 }
 
-extern int menuanimation;
-
 static void animenu_hide(struct animenucontext *menu) {
   int frame;
   for (frame = 0; frame < OSD_MAXANIMFRAME; frame += 40) {
     animenu_hideframe(menu, frame);
-    usleep(menuanimation);
+    usleep(menu->menuanimation);
   }
 }
 
@@ -357,6 +353,8 @@ static int animenu_readmenufile(FILE *f, char ***item) {
   char rx_comment[] = "^\\s*#.*";
   char rx_empty[] = "^\\s*$";
   char rx_nested[] = "^\\s+.*";
+
+  struct animenu_options* options = get_options();
 
   /* read item to buffer*/
   b[0] = '\0';
@@ -406,14 +404,14 @@ static int animenu_readmenufile(FILE *f, char ***item) {
   (*item)[0] = malloc(idx * (maxlen + 1) * sizeof(char));
   int pos = 0;
   char *n = NULL;
-  if (debug > 0)
+  if (options->debug > 0)
     fprintf(stderr, "parsed config item:\n");
   for (i = 0; pos < strlen(b); i++) {
     (*item)[i] = (*item)[0] + i * (maxlen + 1);
     n = strchr(b + pos, '\n');
     _strncpy((*item)[i], b + pos, n - (b + pos) + 1);
     pos += n - (b + pos) + 1;
-    if (debug > 0)
+    if (options->debug > 0)
       fprintf(stderr, "[%d] %s\n", i, (*item)[i]);
   }
   free(b);
@@ -514,6 +512,8 @@ int animenu_browse(struct animenuitem *mi) {
   char cur[BUFSIZE + 1], *all_cmd, *title, path[BUFSIZE + 1];
   unsigned int size;
 
+  const struct animenu_options* options = get_options();
+
   if (mi->path)
     /* path already set, so use that */
     _strncpy(path, mi->path, BUFSIZE + 1);
@@ -556,6 +556,7 @@ int animenu_browse(struct animenuitem *mi) {
   menu->currentitem = NULL;
   menu->parent = mi->parent;
   menu->osd = NULL;
+  menu->menuanimation = options->menuanimation;
 
   for (*cur = '\0'; (dirent = readdir(d));) {
     /* use 'back' navigation to move up through the file hierarchy instead */
@@ -662,6 +663,8 @@ struct animenucontext *animenu_create(struct animenucontext *parent, enum animen
   char cmdbuf[BUFSIZE + 1];
   char regexbuf[BUFSIZE + 1];
 
+  struct animenu_options* options = get_options();
+
   if (!(menu = malloc(sizeof(struct animenucontext))))
     return(NULL);
   memset(menu, 0, sizeof(struct animenucontext));
@@ -677,6 +680,7 @@ struct animenucontext *animenu_create(struct animenucontext *parent, enum animen
   menu->currentitem = NULL;
   menu->parent = parent;
   menu->osd = NULL;
+  menu->menuanimation = options->menuanimation;
 
   if (!(f = fopen(filename, "r"))) {
     /* cannot open file */

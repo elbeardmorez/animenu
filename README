@@ -35,12 +35,14 @@ animenu takes the following options:
   -h --help              display a help message
   -v --version           display version
   -d --daemon            run in background
-  -f --font              use specified font
-                         (X11 fontspec, as returned by xfontsel)
+  -f --fontspec          use full font specification
+                         (x11 fontspec, as returned by xfontsel)
   -n --fontname          specify font by family name only
-                         (i.e. Times, Mistral, etc.)
-  -c --fgcolor           use specified foreground color
-  -s --selectfgcolor     color of selected item
+                         (i.e. Bitstream Charter, Fixed, etc.)
+  -s --fontsize          specify font by family name only
+  -b --bgcolour          use specified background colour
+  -c --fgcolour          use specified foreground colour
+  -s --fgcoloursel       colour of selected item
   -t --menutimeout       how long before menu disappears (0 for no timeout)
   -a --menuanimation     menu animation speed (microseconds)
   -M --dump              dump menu structure to screen
@@ -59,6 +61,7 @@ the following commands can be used in your '.lircrc' file:
 
 #####################
 # configuration files
+
 ~/.animenu/animenurc  : run control file which may contain any of the above
                         options. note these options are overridden by command
                         line options
@@ -88,7 +91,15 @@ browse_re curse /path/regexp_pattern
 
 see 'examples' directory for inspiration
 
-######
-# misc
--note that there is currently no protection against circular references!
+########
+# issues
+
+-there is currently no protection against circular references in either
+sub-menus or filesystem-menus
+-excessively long (+1000 character) paths will cause problems. the PATH_MAX
+constant in 'limits.h' is not a viable solution, and was replaced by a fixed
+1024 limit, which may be tweaked manually in 'animenu.h' dependent on the
+filesystem you have in use. this issue may eventually be revisited
+-some non-existent fonts (eg. fixed-36) get through the current validity
+checking, but render blank
 

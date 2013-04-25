@@ -1,13 +1,8 @@
 
 # short term
--make options struct
--remove global options
--re-work animenurc file
--make options file reading more generic
--extend supported options file options
--reinstate bgcolour option
--add command line / option file option for root menu name
--add command line / option file option for data file path
+-add logging functions
+-add command line/option file option for root menu name
+-add command line/option file option for data files path
 -back out undocumented lirc rc file option
 -re-work/merge root/submenu creation
 -struct options for animenu_create, avoid specifying multiple empty parameters
@@ -23,7 +18,6 @@
 -fix segfault on empty folders
 -fix various failing regexp based browse menus
 -use an options struct for animenu_create
--root menu name command line rc path option
 -browse blocks
 -expand regular expressions support
 -browse sort order

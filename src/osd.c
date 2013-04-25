@@ -55,24 +55,24 @@ struct osdprivate {
   int itemoffset;
 #ifdef HAVE_LIBXFT
   XftDraw *xftdraw;
-  XftColor bgcolor, fgcolor;
+  XftColor bgcolour, fgcolour;
 #endif  /* HAVE_LIBXFT */
   int frame;
   void *userdata;
   void *(*osdidcallback) (void *ud, struct osditemdata **osdid);
 };
 
-static unsigned long getcolor(struct osdcontext *osd, char *colorname) {
-  XColor color;
+static unsigned long getcolour(struct osdcontext *osd, char *colourname) {
+  XColor colour;
   XWindowAttributes winattr;
   XGetWindowAttributes(osd->priv->display, RootWindow(osd->priv->display, DefaultScreen(osd->priv->display)), &winattr);
 
-  color.pixel = 0;
-  if ((XParseColor(osd->priv->display, winattr.colormap, colorname, &color)) == 0)
-    fprintf(stderr, "XParseColor: cannot resolve colorname %s.\n", colorname);
-  color.flags = DoRed | DoGreen | DoBlue;
-  XAllocColor(osd->priv->display, winattr.colormap, &color);
-  return color.pixel;
+  colour.pixel = 0;
+  if ((XParseColor(osd->priv->display, winattr.colormap, colourname, &colour)) == 0)
+    fprintf(stderr, "XParseColor: cannot resolve colorname %s.\n", colourname);
+  colour.flags = DoRed | DoGreen | DoBlue;
+  XAllocColor(osd->priv->display, winattr.colormap, &colour);
+  return colour.pixel;
 }
 
 static void osd_sync(struct osdcontext *osd) {
@@ -115,7 +115,7 @@ static void osd_initanim(struct osdcontext *osd) {
             osd->priv->greengc, 0, 0, osd->priv->width, osd->priv->height, 0, 0);
 
 #ifdef HAVE_LIBXFT
-  XftDrawRect(osd->priv->xftdraw, &osd->priv->bgcolor, 0, 0, osd->priv->width, osd->priv->height);
+  XftDrawRect(osd->priv->xftdraw, &osd->priv->bgcolour, 0, 0, osd->priv->width, osd->priv->height);
 #endif /* HAVE_LIBXFT */
 
   osd->priv->mapped = 1;
@@ -173,7 +173,7 @@ static void osd_showframe(struct osdcontext *osd, int frame) {
   osd_sync(osd);
 }
 
-static void osd_show(struct osdcontext *osd) {
+static void osd_show(struct osdcontext *osd, int menuanimation) {
   int frame;
   for (frame = 0; frame < OSD_MAXANIMFRAME; frame += 30) {
     osd->showframe(osd, frame);
@@ -236,7 +236,7 @@ static void osd_hideframe(struct osdcontext *osd, int frame) {
   }
 }
 
-static void osd_hide(struct osdcontext *osd) {
+static void osd_hide(struct osdcontext *osd, int menuanimation) {
   int frame;
   for (frame = 0; frame < OSD_MAXANIMFRAME; frame += 40) {
     osd->hideframe(osd, frame);
@@ -244,17 +244,17 @@ static void osd_hide(struct osdcontext *osd) {
   }
 }
 
-static void osd_dispose(struct osdcontext *osd) {
+static void osd_dispose(struct osdcontext *osd, int menuanimation) {
   if (osd->priv->mapped)
-    osd->hide(osd);
+    osd->hide(osd, menuanimation);
   free(osd);
 }
 
 #ifdef HAVE_LIBXFT
 void setup_xft(struct osdcontext *osd) {
   XftDraw *xftdraw;
-  XftColor color_bg, color_fg, colortwo;
-  XRenderColor colortmp;
+  XftColor colour_bg, colour_fg, colourtwo;
+  XRenderColor colourtmp;
   int screen_num = DefaultScreen(osd->priv->display);
 
   osd->priv->xftdraw =
@@ -265,21 +265,21 @@ void setup_xft(struct osdcontext *osd) {
   if (!osd->priv->xftdraw)
     return;
 
-  colortmp.red = 0x0;
-  colortmp.green = 0x0;
-  colortmp.blue = 0x0;
-  colortmp.alpha = 0x006000;
+  colourtmp.red = 0x0;
+  colourtmp.green = 0x0;
+  colourtmp.blue = 0x0;
+  colourtmp.alpha = 0x006000;
   XftColorAllocValue(osd->priv->display,
                      DefaultVisual(osd->priv->display, screen_num),
-                     DefaultColormap(osd->priv->display, screen_num), &colortmp, &osd->priv->bgcolor);
+                     DefaultColormap(osd->priv->display, screen_num), &colourtmp, &osd->priv->bgcolour);
 
-  colortmp.red = 0x0;
-  colortmp.green = 0x0;
-  colortmp.blue = 0x0;
-  colortmp.alpha = 0x00ffff;
+  colourtmp.red = 0x0;
+  colourtmp.green = 0x0;
+  colourtmp.blue = 0x0;
+  colourtmp.alpha = 0x00ffff;
   XftColorAllocValue(osd->priv->display,
                      DefaultVisual(osd->priv->display, screen_num),
-                     DefaultColormap(osd->priv->display, screen_num), &colortmp, &osd->priv->fgcolor);
+                     DefaultColormap(osd->priv->display, screen_num), &colourtmp, &osd->priv->fgcolour);
 
 }
 #endif /* HAVE_LIBXFT */
@@ -319,6 +319,8 @@ struct osdcontext *osd_create(struct osdcontext *parent,
   int txt_direction;
   int width, screen_num;
 
+  struct animenu_options* options = get_options();
+
   if (!(osd = malloc(sizeof(struct osdcontext)))) {
     fprintf(stderr, "cannot allocate osdcontext!\n");
     return(NULL);
@@ -349,7 +351,7 @@ struct osdcontext *osd_create(struct osdcontext *parent,
 
   screen_num = DefaultScreen(osdp->display);
 
-  osd->priv->font = XLoadQueryFont(osd->priv->display, fontname);
+  osd->priv->font = XLoadQueryFont(osd->priv->display, options->fontspec);
 
   if (osd->priv->font == NULL) {
     fprintf(stderr, "trying alternate font\n");
@@ -359,7 +361,7 @@ struct osdcontext *osd_create(struct osdcontext *parent,
       fprintf(stderr, "trying \"fixed\" font\n");
       osd->priv->font = XLoadQueryFont(osd->priv->display, "fixed");
       if (osd->priv->font == NULL) {
-        fprintf(stderr, "your X server is probably broken\n");
+        fprintf(stderr, "error: could not load any font. xfs or your x-server is broken?\n");
         return(NULL);
       }
     }
@@ -407,14 +409,14 @@ struct osdcontext *osd_create(struct osdcontext *parent,
   XChangeWindowAttributes(osd->priv->display, osd->priv->win, CWSaveUnder | CWOverrideRedirect, &xattributes);
   XStoreName(osd->priv->display, osd->priv->win, "osd");
 
-  gcval.foreground = getcolor(osd, fgcolor);
-  gcval.background = getcolor(osd, bgcolor);
+  gcval.foreground = getcolour(osd, options->fgcolour);
+  gcval.background = getcolour(osd, options->bgcolour);
   gcval.graphics_exposures = 0;
 
   osd->priv->greengc = XCreateGC(osd->priv->display, osd->priv->win,
                                  GCForeground | GCBackground | GCGraphicsExposures, &gcval);
 
-  gcval.foreground = getcolor(osd, selectfgcolor);
+  gcval.foreground = getcolour(osd, options->fgcoloursel);
   osd->priv->lightgrngc = XCreateGC(osd->priv->display, osd->priv->win,
                                     GCForeground | GCBackground | GCGraphicsExposures, &gcval);
 

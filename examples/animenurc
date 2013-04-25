@@ -1,43 +1,89 @@
-# animenu config file by Massimo Maricchiolo <mmaricch@yahoo.com>
-# Modifications by Alastair M. Robinson
 
-##################################################################
+##
+# animenu - lirc menu system
 #
-# Select a font from its name and size:
+#  copyright (c) 2009, 2012-2013 by Pete Beardmore <pete.beardmore@msn.com>
+#  copyright (c) 2002 by Massimo Maricchiolo <mmaricch@yahoo.com>
+#  copyright (c) 2001-2003 by Alastair M. Robinson <blackfive@fakenhamweb.co.uk>
 #
-# fontname<=| |\t>font name[<,|\t>font size]
-# Default font size is 36
-
-fontname=Palladio L, 36
-
-##################################################################
-#
-# Select a font from its font specification:
-#
-# fontdesc<=| |\t>font specification
-#
-# The *'s are wildcards and the fields in order are:
-# foundry (i.e. creator of font), family (i.e. name), weight, style,
-# pixel size, point size, x and y resolutions, spacing, average width,
-# encoding registry, and encoding
-#
-# You can use xfontsel to create one of these specifications.
-#
-# If you specify both fontname and fontdesc, what stated in fontdesc
-# override the setting made in fontname.
-# The default fontdesc is:
-#   -misc-fixed-medium-r-normal--36-*-75-75-c-*-iso8859-*
-
-#font = -*-mistral-*-*-*-*-36-*-75-75-*-*-iso8859-*
-
-##################################################################
-#
-# Select the text color with a name or rgb value
-#
-# rgbcolor<=| |\t>rgb text color<,| |\t>rgb selected text color
-#
-# the rgb colors must be in the format: "rgb:rr/gg/bb" without quote.
+#  licensed under GNU General Public License 2.0 or later
+#  some rights reserved. see COPYING, AUTHORS
 #
 
-color = rgb:5d/ff/10, rgb:ce/ff/cf
+##
+# specify a font by its full font specification:
+#
+# fontspec<=| |\t>font specification
+#
+# default 'fontspec' is: -misc-fixed-medium-r-normal--36-*-75-75-c-*-iso8859-*
+#
+# the template -*-*-*-*-*-*-*-*-*-*-*-*-*-* has 14 fields representing:
+#
+# foundry (creator)
+# family (name)
+# weight
+# slant
+# set width (proportional width: normal, narrow)
+# style name
+# pixel size
+# point size
+# x resolution
+# y resolution
+# spacing
+# average width
+# encoding registry
+# encoding
+#
+# '*' is used as a wildcard. use of 'xfontsel' to create one of these
+# specifications is higly recommended
+#
+# note that 'fontspec' takes presidence over both 'fontname' and 'fontsize'
+
+##
+# specify a font by name only:
+#
+# fontname<=| |\t>NAME
+#
+# default 'fontname' is: fixed
+
+##
+# set a font size:
+#
+# fontsize<=| |\t>SIZE
+#
+# default fontsize is: 24
+
+##
+# set the menu background colour with a name or rgb value
+#
+# bgcolour<=| |\t>rgb colour
+#
+# default 'bgcolour' is: black
+#
+# the rgb colours must be in the format: 'rgb:rr/gg/bb' (without quotes!)
+
+##
+# select the default text colour with a name or rgb value
+#
+# fgcolour<=| |\t>rgb colour
+#
+# default 'fgcolour' is: rgb:88/88/88  <- mid-grey
+#
+# the rgb colours must be in the format: 'rgb:rr/gg/bb' (without quotes!)
+
+##
+# set the selected text colour with a name or rgb value
+#
+# fgcoloursel<=| |\t>rgb colour
+#
+# default 'fgcoloursel' is: white
+#
+# the rgb colours must be in the format: 'rgb:rr/gg/bb' (without quotes!)
+
+#fontspec = -misc-fixed-medium-r-normal--36-*-75-75-c-*-iso8859-*
+#fontname = fixed
+fontsize = 18
+#bgcolour = black
+#fgcolour = rgb:88/88/88
+#fgcoloursel = white
 

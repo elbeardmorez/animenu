@@ -1,18 +1,18 @@
-browse_recurse /home/amr/MP3s/.*\.(mp3|wav)
-  MP3s
+browse_recurse /home/music/.*\.(mp3|wav)
+  music
   xmms -p
-browse /home/amr/Videos/.*\.(mpg|mpeg|avi|rm|mov|wmv)
-  Movie
+browse /home/films/.*\.(mpg|mpeg|avi|rm|mov|wmv)
+  films
   mplayer -vo xv -fs
 menu
-  Emulators
+  emulators
   emulators.menu
 menu
-  Graphics
+  graphics
   graphics.menu
 menu
-  Internet
+  internet
   internet.menu
 menu
-  Sound
-  sound.menu
+  audio
+  audio.menu

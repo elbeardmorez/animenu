@@ -13,117 +13,194 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <getopt.h>
 
 #include "options.h"
 
-char rc_fontspec[BUFSIZE + 1];
-char rc_color[BUFSIZE + 1];
-char rc_selcolor[BUFSIZE + 1];
+char *progname = PACKAGE "-" VERSION;
+static struct animenu_options options;
 
-char *makefontspec(char *fontname, char *fontsize) {
-  rc_fontspec[0] = 0;
-  strcat(rc_fontspec, "-*-");
-  strcat(rc_fontspec, fontname);
-  strcat(rc_fontspec, "-*-*-*--");
-  if (fontsize)
-    strcat(rc_fontspec, fontsize);
-  else
-    strcat(rc_fontspec, "36");
-  strcat(rc_fontspec, "-*-*-*-*-*-*-*");
-  return(rc_fontspec);
+struct animenu_options* get_options() {
+  return (&options);
+};
+
+void makefontspec() {
+  snprintf(options.fontspec, BUFSIZE + 1,
+           "-*-%s-*-*-*--%s-*-*-*-*-*-*-*",
+           options.fontname, options.fontsize);
 }
 
 int read_config() {
-  char buff[BUFSIZE + 1];
-  char *tmp, *key, *val, *val1, *rr, *c, *c1;
+
+  char buf[BUFSIZE + 1];
+  char *tmp, *key, *val;
   int len, pos, i;
   FILE *f;
 
-  buff[0] = 0;
-  strcat(buff, getenv("HOME"));
-  strcat(buff, "/.animenu/animenurc");
+  buf[0] = '\0';
+  strcat(buf, getenv("HOME"));
+  strcat(buf, "/.animenu/animenurc");
 
-  if (!(f = fopen(buff, "r")))
+  if (!(f = fopen(buf, "r")))
     return(0);
 
-  while (fgets(buff, sizeof(buff), f) != NULL) {
-    len = strlen(buff);
+  while (fgets(buf, sizeof(buf), f) != NULL) {
+    len = strlen(buf);
     for (i = 0; i < len; i++)
-      buff[i] = tolower(buff[i]);
+      buf[i] = tolower(buf[i]);
 
-    if (buff[0] == '#')
+    if (buf[0] == '#')
       continue;
     if (len < 5)
       continue;
 
     len--;
-    if (buff[len] == '\n')
-      buff[len] = '\0';
+    if (buf[len] == '\n')
+      buf[len] = '\0';
     len--;
-    if (buff[len] == '\r')
-      buff[len] = '\0';
+    if (buf[len] == '\r')
+      buf[len] = '\0';
 
-    key = strtok(buff, "= \t");
-    if (strcmp(key, "fontname") == 0) {
+    key = strtok(buf, "= \t");
+    for (i = 0; i < len; i++) {
+      /* generic */
       pos = strlen(key) + 1;
-      while (buff[pos] == '=' || buff[pos] == '\t')
+      while (buf[pos] == '=' || buf[pos] == '\t' || buf[pos] == ' ')
         pos++;
-      tmp = &buff[pos];
-
-      val = strtok(tmp, ",\t");
-      if (val[0] != '\0') {
-        pos = strlen(val) + 1;
-        while (tmp[pos] == ',' || tmp[pos] == '\t' || tmp[pos] == ' ')
-          pos++;
-        tmp = &tmp[pos];
-        val1 = strtok(tmp, "\t #");
-        if (val[0] == '\0')
-          val1 = NULL;
-        makefontspec(val, val1);
-      }
-    }
-
-    if (strcmp(key, "font") == 0) {
-      pos = strlen(key) + 1;
-      while (buff[pos] == '=' || buff[pos] == '\t' || buff[pos] == ' ')
-        pos++;
-      tmp = &buff[pos];
-
+      tmp = &buf[pos];
       val = strtok(tmp, "\t #");
-      strcat(rc_fontspec, val);
-    }
-
-    if (strcmp(key, "color") == 0) {
-      pos = strlen(key) + 1;
-      while (buff[pos] == '=' || buff[pos] == '\t' || buff[pos] == ' ')
-        pos++;
-      tmp = &buff[pos];
-
-      val = strtok(tmp, ",\t");
-      if (val[0] != '\0') {
-        pos = strlen(val) + 1;
-        while (tmp[pos] == ',' || tmp[pos] == '\t' || tmp[pos] == ' ')
-          pos++;
-        tmp = &tmp[pos];
-
-        val1 = strtok(tmp, "\t #");
-        c = strdup(val);
-        c1 = strdup(val1);
-
-        strcpy(rc_color, c);
-        strcpy(rc_selcolor, c1);
+      /* option specific */
+      if (strcmp(key, "fontspec") == 0) {
+        strcpy(options.fontspec, val);
+      } else if (strcmp(key, "fontname") == 0) {
+        strcpy(options.fontname, val);
+        makefontspec();
+      } else if (strcmp(key, "fontsize") == 0) {
+        strcpy(options.fontsize, val);
+        makefontspec();
+      } else if (strcmp(key, "bgcolour") == 0) {
+        strcpy(options.bgcolour, val);
+      } else if (strcmp(key, "fgcolour") == 0) {
+        strcpy(options.fgcolour, val);
+      } else if (strcmp(key, "fgcoloursel") == 0) {
+        strcpy(options.fgcoloursel, val);
       }
     }
   }
-
-  if (rc_fontspec[0])
-    fontname = rc_fontspec;
-  if (rc_color[0])
-    fgcolor = rc_color;
-  if (rc_selcolor[0])
-    selectfgcolor = rc_selcolor;
 
   fclose(f);
 
   return;
 }
+
+int process_options(int argc, char *argv[]) {
+
+  /* set defaults */
+  strcpy(options.progname, PACKAGE);
+  strcpy(options.progver, PACKAGE "-" VERSION);
+  strcpy(options.fontspec, "-misc-fixed-medium-r-normal--24-*-75-75-c-*-iso8859-*");
+  strcpy(options.fontname, "fixed");
+  strcpy(options.fontsize, "24");
+  strcpy(options.bgcolour, "black");
+  strcpy(options.fgcolour, "rgb:88/88/88");
+  strcpy(options.fgcoloursel, "white");
+  options.menutimeout = 5;
+  options.menuanimation = 1000;
+  options.daemonise = 0;
+  options.dump = 0;
+  options.debug = 0;
+
+  /* read rc file */
+  read_config();
+
+  /* process command line args */
+  while (1) {
+    int c;
+    static struct option long_options[] = {
+      {"help", no_argument, NULL, 'h'},
+      {"version", no_argument, NULL, 'v'},
+      {"daemon", no_argument, NULL, 'd'},
+      {"fontspec", required_argument, NULL, 'f'},
+      {"fontname", required_argument, NULL, 'n'},
+      {"fontsize", required_argument, NULL, 'z'},
+      {"bgcolour", required_argument, NULL, 'b'},
+      {"fgcolour", required_argument, NULL, 'c'},
+      {"fgcoloursel", required_argument, NULL,'s'},
+      {"menutimeout", required_argument, NULL, 't'},
+      {"menuanimation", required_argument, NULL, 'a'},
+      {"dump", no_argument, NULL, 'M'},
+      {"debug", optional_argument, NULL, 'D'},
+      {0, 0, 0, 0}
+    };
+    c = getopt_long(argc, argv, "hvdf:n:z:b:c:s:t:a:M:D::", long_options, NULL);
+    if (c == -1)
+      break;
+    switch (c) {
+      case 'h':
+        printf("Usage: %s [options]\n", argv[0]);
+        printf("\t -h    --help\t\tdisplay this message\n");
+        printf("\t -v    --version\t\tdisplay version\n");
+        printf("\t -d    --daemon\t\trun in background\n");
+        printf("\t -f    --fontspec\t\tuse specified font (xfontsel format)\n");
+        printf("\t -n    --fontname\t\tspecify font by family name only\n");
+        printf("\t -z    --fontsize\t\tset the font size\n");
+        printf("\t -b    --bgcolour\t\tuse specified background colour\n");
+        printf("\t -c    --fgcolour\t\tuse specified foreground colour\n");
+        printf("\t -s    --fgcoloursel\t\tcolour of selected item\n");
+        printf("\t -t    --menutimeout\t\thow long before menu dissapears (0 for no timeout)\n");
+        printf("\t -a    --menuanimation\t\tmenu animation speed (microseconds)\n");
+        printf("\t -M    --dump\t\tdump menu structure to screen\n");
+        printf("\t -D[x] --debug=[x]\tenable log. optional verbosity [1 .. 2] (default: 1)\n");
+        return (option_exitsuccess);
+      case 'v':
+        printf("%s\n", options.progname);
+        return (option_exitsuccess);
+      case 'd':
+        options.daemonise = 1;
+        break;
+      case 'f':
+        strcpy(options.fontspec, optarg);
+        break;
+      case 'n':
+        strcpy(options.fontname, optarg);
+        makefontspec();
+        break;
+      case 'z':
+        strcpy(options.fontsize, optarg);
+        makefontspec();
+        break;
+      case 'b':
+        strcpy(options.bgcolour, optarg);
+        break;
+      case 'c':
+        strcpy(options.fgcolour, optarg);
+        break;
+      case 's':
+        strcpy(options.fgcoloursel, optarg);
+        break;
+      case 't':
+        options.menutimeout = atoi(optarg);
+        break;
+      case 'a':
+        options.menuanimation = atoi(optarg);
+        break;
+      case 'M':
+        options.dump = 1;
+        break;
+      case 'D':
+        options.debug = optarg ? atoi(optarg) : 1;
+        break;
+      default:
+        printf("Usage: %s [options]\n", argv[0]);
+        return (option_exitfailure);
+    }
+  }
+  if (optind < argc - 1) {
+    fprintf(stderr, "%s: too many arguments\n", options.progname);
+    return (option_exitfailure);
+  }
+  return ((options.daemonise ? option_daemonise : option_null));
+
+}
+
+
