@@ -1,3 +1,27 @@
+2013Apr24 version 7a47ee20a96adc9f0b569346a23798d90b4d2993
+ - [imp] don't use PATH_MAX (Pete Beardmore)
+2013Apr24 version 0e1ef68da08a47832faedf8f069c6e4fa6d4372c
+ - [imp] use common header for defines (Pete Beardmore)
+2013Apr24 version 7fccba35566f9ed01636d5dcb9590c2bb609cf95
+ - [imp] use the more compatable 'test' (over '[') program in make files (Pete Beardmore)
+2013Apr24 version 030aa4f0ee70847ef9953a1c079fa3af110f3749
+ - [fix] logic errors in option reading (Pete Beardmore)
+2013Apr23 version b2dea7cea3213c54899d77e2f20360cd1ae2c266
+ - [sup] update/add licence headers on all source files (Pete Beardmore)
+2013Apr23 version 70ad7eae61ccd46523568f83a9f9c1cc1c240d32
+ - [imp] bootstrap aesthetics (Pete Beardmore)
+2013Apr22 version a506342b13af123cc1dc6985783895a8f33fe8b9
+ - [imp] autotools update (Pete Beardmore)
+2013Apr22 version 5134d5faddd34bc7b6c1e2960970c4086a57b527
+ - [imp] project restructuring (Pete Beardmore)
+2012Apr07 version b305fcb046f7f03afaf9d811dfc92415015630bb
+ - [imp] re-implement menu config parser (Pete Beardmore)
+2012Apr06 version c8d90eb17447990ee82dc305de26520c4d00254f
+ - [imp] refresh main loop code (Pete Beardmore)
+2012Apr05 version 51ab5a7306f79ffc693104feb1798e2a0ab92d53
+ - [fix] regular expression matching (Pete Beardmore)
+2012Apr04 version 70a7ff1ca1f0466f1eb7fefbf9ca55673390755f
+ - [sup] update project files (Pete Beardmore)
 2012Apr04 version d6d7a79360ecfaccb18d18ce3aafdb768eec01aa
  - [add] debug option (Pete Beardmore)
 2012Apr03 version 3bde60a7122cd09a11db4f8018c03fdc6f10202f

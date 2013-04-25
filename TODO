@@ -1,19 +1,39 @@
 
 # short term
--refactor variable names
+-make options struct
+-remove global options
+-re-work animenurc file
+-make options file reading more generic
+-extend supported options file options
+-reinstate bgcolour option
+-add command line / option file option for root menu name
+-add command line / option file option for data file path
+-back out undocumented lirc rc file option
+-re-work/merge root/submenu creation
+-struct options for animenu_create, avoid specifying multiple empty parameters
+-refactor mash of option related variable names
+-refactor menu related variable names
+-remove small mem leak seen following read options
+-more descriptive failed menu error messages
+-re-order menu file structures
+-root button to get back to root of menu
+-remember menu path and reconstruct it on menu show
+-enable non-show commands only if menu shown
+-remove invisible item when cycling menu
 -fix segfault on empty folders
 -fix various failing regexp based browse menus
--fix logic errors in options.c
 -use an options struct for animenu_create
--root menu name command line /rc file option
+-root menu name command line rc path option
 -browse blocks
 -expand regular expressions support
 -browse sort order
 -max menu width
 -scrollable items
 -overlapping menu nesting
+-modify colour of overlapped menus
 -menu headers
 -item padding add menu pointer
+-expand shell variables in browse paths
 
 # long term
 -real transparency
