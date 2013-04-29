@@ -125,23 +125,23 @@ int main(int argc, char *argv[]) {
   if (lirc_init(options->progname, options->debug) == -1)
     exit(EXIT_FAILURE);
 
-    if (options->daemonise) {
-      if (daemon(0, 0) == -1) {
-        fprintf(stderr, "%s: can't daemonise\n", options->progname);
-        perror(options->progname);
-        lirc_freeconfig(config);
-        lirc_deinit();
-        exit(EXIT_FAILURE);
-      }
+  if (options->daemonise) {
+    if (daemon(0, 0) == -1) {
+      fprintf(stderr, "%s: can't daemonise\n", options->progname);
+      perror(options->progname);
+      lirc_freeconfig(config);
+      lirc_deinit();
+      exit(EXIT_FAILURE);
     }
+  }
 
   char *code;
   char *c;
   int ret;
   config = NULL;
-    while (lirc_nextcode(&code) == 0) {
-      if (code == NULL)
-        continue;
+  while (lirc_nextcode(&code) == 0) {
+    if (code == NULL)
+      continue;
 
     /* test config */
     fstat = (struct stat){0};
@@ -162,78 +162,78 @@ int main(int argc, char *argv[]) {
     if (config == NULL)
       continue;
 
-      while ((ret = lirc_code2char(config, code, &c)) == 0 && c != NULL) {
-        struct lirc_command * cmd = parse_codes(lirc_commands,c);
-        if (!cmd)
-          fprintf(stderr, "command not recognised: %s\n", c);
-        else {
-          if (options->menutimeout != 0)
-            alarm(0);
-          switch (cmd->id) {
-            case id_show:
-              if (rootmenu->visible) {
-                rootmenu->hide(rootmenu);
-                currentmenu = NULL;
-              } else {
-                rootmenu->show(rootmenu);
+    while ((ret = lirc_code2char(config, code, &c)) == 0 && c != NULL) {
+      struct lirc_command * cmd = parse_codes(lirc_commands,c);
+      if (!cmd)
+        fprintf(stderr, "command not recognised: %s\n", c);
+      else {
+        if (options->menutimeout != 0)
+          alarm(0);
+        switch (cmd->id) {
+          case id_show:
+            if (rootmenu->visible) {
+              rootmenu->hide(rootmenu);
+              currentmenu = NULL;
+            } else {
+              rootmenu->show(rootmenu);
+              if (options->debug > 0)
+                printf("root | current item: '%s'\n",
+                       rootmenu->currentitem ? rootmenu->currentitem->title : "NULL");
+              rootmenu->next(rootmenu);
+              if (options->debug > 0)
+                printf("root | current item: '%s'\n",
+                       rootmenu->currentitem ? rootmenu->currentitem->title : "NULL");
+              /* navigate based on currentmenu */
+              currentmenu = rootmenu;
+            }
+            break;
+          case id_next:
+            if (currentmenu != NULL)
+              currentmenu->next(currentmenu);
+            break;
+          case id_prev:
+            if (currentmenu != NULL)
+              currentmenu->prev(currentmenu);
+            break;
+          case id_select:
+            if (currentmenu != NULL && currentmenu->currentitem != NULL)
+              currentmenu->currentitem->go(currentmenu->currentitem);
+            break;
+          case id_back:
+            if (currentmenu != NULL && currentmenu->parent != NULL) {
+              currentmenu->hide(currentmenu);
+              currentmenu = currentmenu->parent;
+              currentmenu->showcurrent(currentmenu);
+            }
+            break;
+          case id_forward:
+            if (currentmenu != NULL && currentmenu->currentitem != NULL) {
+              currentmenu->currentitem->select(currentmenu->currentitem);
+              if ((currentmenu->currentitem->submenu != NULL) &&
+                  (currentmenu->currentitem->submenu->visible)) {
+                currentmenu = currentmenu->currentitem->submenu;
+                if (strstr(currentmenu->currentitem->title, playall) != 0)
+                  currentmenu->next(currentmenu);
                 if (options->debug > 0)
-                  printf("root | current item: '%s'\n",
-                         rootmenu->currentitem ? rootmenu->currentitem->title : "NULL");
-                rootmenu->next(rootmenu);
-                if (options->debug > 0)
-                  printf("root | current item: '%s'\n",
-                         rootmenu->currentitem ? rootmenu->currentitem->title : "NULL");
-                /* navigate based on currentmenu */
-                currentmenu = rootmenu;
+                  printf("current item: '%s'\n", currentmenu->currentitem->title);
               }
-              break;
-            case id_next:
-              if (currentmenu != NULL)
-                currentmenu->next(currentmenu);
-              break;
-            case id_prev:
-              if (currentmenu != NULL)
-                currentmenu->prev(currentmenu);
-              break;
-            case id_select:
-              if (currentmenu != NULL && currentmenu->currentitem != NULL)
-                currentmenu->currentitem->go(currentmenu->currentitem);
-              break;
-            case id_back:
-              if(currentmenu != NULL && currentmenu->parent != NULL) {
-                currentmenu->hide(currentmenu);
-                currentmenu = currentmenu->parent;
-                currentmenu->showcurrent(currentmenu);
-              }
-              break;
-            case id_forward:
-              if (currentmenu != NULL && currentmenu->currentitem != NULL) {
-                currentmenu->currentitem->select(currentmenu->currentitem);
-                if ((currentmenu->currentitem->submenu != NULL) &&
-                    (currentmenu->currentitem->submenu->visible)) {
-                  currentmenu = currentmenu->currentitem->submenu;
-                  if (strstr(currentmenu->currentitem->title, playall) != 0)
-                    currentmenu->next(currentmenu);
-                  if (options->debug > 0)
-                    printf("current item: '%s'\n", currentmenu->currentitem->title);
-                }
-              }
-              break;
-          }
-          if ((cmd->id == id_show) && !(rootmenu->visible))
-            ; /* no-op */
-          else if (options->menutimeout != 0) {
-            alarm_pending = 1;
-            alarm(options->menutimeout);
-          }
-        } /* valid command */
-      } /* while code2char */
-      free(code);
+            }
+            break;
+        }
+        if ((cmd->id == id_show) && !(rootmenu->visible))
+          ; /* no-op */
+        else if (options->menutimeout != 0) {
+          alarm_pending = 1;
+          alarm(options->menutimeout);
+        }
+      } /* valid command */
+    } /* while code2char */
+    free(code);
     if (ret == -1)
       fprintf(stderr, "animenu: lirc failed to process code: \n'%s'\n", code);
-    } /* while waiting for next lirc code */
-    lirc_freeconfig(config);
-            
+  } /* while waiting for next lirc code */
+  lirc_freeconfig(config);
+
   /* close lirc connection */
   lirc_deinit();
 
