@@ -105,6 +105,7 @@ int process_options(int argc, char *argv[]) {
   strcpy(options.bgcolour, "black");
   strcpy(options.fgcolour, "rgb:88/88/88");
   strcpy(options.fgcoloursel, "white");
+  sprintf(options.lircrcfile, "%s/.lircrc", getenv("HOME"));
   options.menutimeout = 5;
   options.menuanimation = 1000;
   options.daemonise = 0;
@@ -196,7 +197,10 @@ int process_options(int argc, char *argv[]) {
         return (option_exitfailure);
     }
   }
-  if (optind < argc - 1) {
+  /* lircrc path */
+  if (optind == argc - 1)
+    strcpy(options.lircrcfile, argv[optind]);
+  else if (optind < argc - 1) {
     fprintf(stderr, "%s: too many arguments\n", options.progname);
     return (option_exitfailure);
   }

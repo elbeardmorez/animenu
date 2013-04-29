@@ -27,6 +27,7 @@ struct animenu_options {
   char bgcolour[BUFSIZE + 1];
   char fgcolour[BUFSIZE + 1];
   char fgcoloursel[BUFSIZE + 1];
+  char lircrcfile[BUFSIZE + 1];
   int menutimeout;
   int menuanimation;
   int daemonise;

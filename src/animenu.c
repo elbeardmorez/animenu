@@ -21,6 +21,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <time.h>
 #include <lirc/lirc_client.h>
 
 #include "animenu.h"
@@ -86,6 +89,7 @@ struct lirc_command * parse_codes(struct lirc_command* cmds, const char *cmd) {
 
 int main(int argc, char *argv[]) {
   struct lirc_config *config;
+  struct stat fstat, fstat_lircrc;
 
   switch (process_options(argc, argv)) {
     case option_exitsuccess:
@@ -102,6 +106,7 @@ int main(int argc, char *argv[]) {
     return(EXIT_FAILURE);
   }
 
+  /* create root menu */
   char file[PATH_MAX] = "";
   snprintf(file, PATH_MAX - 1, "%s/.animenu/%s", getenv("HOME"), "root.menu");
   if (!(rootmenu = animenu_create(NULL, animenuitem_submenu, file))) {
@@ -120,11 +125,6 @@ int main(int argc, char *argv[]) {
   if (lirc_init(options->progname, options->debug) == -1)
     exit(EXIT_FAILURE);
 
-  if (lirc_readconfig(optind != argc ? argv[optind] : NULL, &config, NULL) == 0) {
-    char *code;
-    char *c;
-    int ret;
-
     if (options->daemonise) {
       if (daemon(0, 0) == -1) {
         fprintf(stderr, "%s: can't daemonise\n", options->progname);
@@ -135,9 +135,33 @@ int main(int argc, char *argv[]) {
       }
     }
 
+  char *code;
+  char *c;
+  int ret;
+  config = NULL;
     while (lirc_nextcode(&code) == 0) {
       if (code == NULL)
         continue;
+
+    /* test config */
+    fstat = (struct stat){0};
+    stat((const char*)options->lircrcfile, &fstat);
+    if (config && (long unsigned int)difftime(fstat.st_mtime, fstat_lircrc.st_mtime) > 0) {
+      /* release config */
+      if (options->debug > 0)
+        fprintf(stderr, "lircrc file '%s' has changed, re-reading\n", options->lircrcfile);
+      lirc_freeconfig(config);
+      config = NULL;
+    }
+    if (config == NULL) {
+      /* (re)read config */
+      lirc_readconfig(options->lircrcfile, &config, NULL);
+      fstat_lircrc = (struct stat){0};
+      stat((const char*)options->lircrcfile, &fstat_lircrc);
+    }
+    if (config == NULL)
+      continue;
+
       while ((ret = lirc_code2char(config, code, &c)) == 0 && c != NULL) {
         struct lirc_command * cmd = parse_codes(lirc_commands,c);
         if (!cmd)
@@ -205,13 +229,11 @@ int main(int argc, char *argv[]) {
         } /* valid command */
       } /* while code2char */
       free(code);
-      if (ret == -1)
-        break;
+    if (ret == -1)
+      fprintf(stderr, "animenu: lirc failed to process code: \n'%s'\n", code);
     } /* while waiting for next lirc code */
-
     lirc_freeconfig(config);
-  } /* config read */
-
+            
   /* close lirc connection */
   lirc_deinit();
 
