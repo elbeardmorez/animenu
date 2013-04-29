@@ -2,7 +2,7 @@
 pkgnam = @PACKAGE_NAME@
 builddir = @abs_top_builddir@
 
-CFLAGS += -ggdb3 -O0
+CFLAGS += -ggdb3 -O0 -Wall -Werror
 LDFLAGS +=
 LIBS +=
 

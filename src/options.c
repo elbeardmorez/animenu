@@ -13,6 +13,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <getopt.h>
 
 #include "options.h"
@@ -90,7 +91,7 @@ int read_config() {
 
   fclose(f);
 
-  return;
+  return (0);
 }
 
 int process_options(int argc, char *argv[]) {

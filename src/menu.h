@@ -66,6 +66,7 @@ struct animenucontext *animenu_create(struct animenucontext *parent,
                                       enum animenuitem_type type, const char *filename);
 struct animenuitem *animenuitem_create(struct animenucontext *menu);
 
+void animenu_dump(struct animenucontext *menu);
 void animenu_test();
 
 #endif

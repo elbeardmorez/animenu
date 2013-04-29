@@ -48,7 +48,6 @@ struct lirc_command lirc_commands[] = {
 };
 
 /* globals */
-static long osd_utime;
 static struct animenucontext *rootmenu;
 static struct animenucontext *currentmenu;
 static int alarm_pending;
@@ -87,7 +86,6 @@ struct lirc_command * parse_codes(struct lirc_command* cmds, const char *cmd) {
 
 int main(int argc, char *argv[]) {
   struct lirc_config *config;
-  int currentchannel = 0;
 
   switch (process_options(argc, argv)) {
     case option_exitsuccess:

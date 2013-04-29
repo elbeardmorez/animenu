@@ -80,9 +80,7 @@ static void osd_sync(struct osdcontext *osd) {
 }
 
 static void osd_showselected(struct osdcontext *osd, int selected) {
-  int items, i, edge, frame = 0;
-  float t;
-  int stepsize = 30;
+  int i;
   struct osditemdata *oid = NULL;
   void *ud = osd->priv->userdata;
 
@@ -252,8 +250,6 @@ static void osd_dispose(struct osdcontext *osd, int menuanimation) {
 
 #ifdef HAVE_LIBXFT
 void setup_xft(struct osdcontext *osd) {
-  XftDraw *xftdraw;
-  XftColor colour_bg, colour_fg, colourtwo;
   XRenderColor colourtmp;
   int screen_num = DefaultScreen(osd->priv->display);
 
@@ -312,12 +308,10 @@ struct osdcontext *osd_create(struct osdcontext *parent,
   struct osdcontext *osd;
   struct osdprivate *osdp;
   XGCValues gcval;
-  GC gc;
   XSizeHints sizehints;
   XSetWindowAttributes xattributes;
   XCharStruct extent;
-  int txt_direction;
-  int width, screen_num;
+  int txt_direction, screen_num;
 
   struct animenu_options* options = get_options();
 

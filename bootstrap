@@ -4,6 +4,7 @@ prgnam=animenu
 target=/usr/local
 
 echo -e '\n# bootstrapping build files, installing macros etc.\n'
+[ -f ./configure.in ] && rm ./configure.in
 autoreconf --install --verbose || exit 
 echo -e '\n# testing system and configuring build tools\n'
 [ -f ./configure ] && ./configure --prefix=$target $@ || exit

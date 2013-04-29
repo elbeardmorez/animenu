@@ -45,6 +45,8 @@ static int animenu_readmenufile(FILE *f, char ***item);
 void *animenu_idcallback(void *ud, struct osditemdata **osdid);
 int animenu_genosd(struct animenucontext *menu);
 void animenu_dump(struct animenucontext *menu);
+char *rx_start(char *s, char **first);
+int rx_compare(const char *s1, const char *s2);
 
 static void animenuitem_dispose(struct animenuitem *mi) {
   if (mi) {
@@ -254,7 +256,6 @@ static void animenuitem_select(struct animenuitem *mi) {
     mi->submenu->show(mi->submenu);
     animenu_showcurrent(mi->submenu);
   } else if (mi->type == animenuitem_browse) {
-    struct animenucontext *submenu = NULL;
     if (animenu_browse(mi)) {
       mi->osddata.title = mi->title;
       mi->submenu->currentitem = mi->submenu->firstitem;
@@ -350,9 +351,9 @@ static int animenu_readmenufile(FILE *f, char ***item) {
   char s[maxlenline];
   char *s2;
   char *b = malloc(maxlenline); /* flattened item buffer */
-  char rx_comment[] = "^\\s*#.*";
-  char rx_empty[] = "^\\s*$";
-  char rx_nested[] = "^\\s+.*";
+  const char* rx_comment = "^\\s*#.*";
+  const char* rx_empty = "^\\s*$";
+  const char* rx_nested = "^\\s+.*";
 
   struct animenu_options* options = get_options();
 
@@ -371,10 +372,10 @@ static int animenu_readmenufile(FILE *f, char ***item) {
         return(FALSE);
       }
     }
-    if (rx_compare(s, &rx_empty) == 0 ||
-        rx_compare(s, &rx_comment) == 0)
+    if (rx_compare(s, rx_empty) == 0 ||
+        rx_compare(s, rx_comment) == 0)
       continue;
-    if (rx_compare(s, &rx_nested) != 0) {
+    if (rx_compare(s, rx_nested) != 0) {
       if (idx > 0) {
         fseek(f, -strlen(s), SEEK_CUR);
         break;
@@ -479,7 +480,7 @@ char *rx_start(char *s, char **first) {
     sprintf(rxc, "\\%c", rx[l]);
     /* locate first occurence of rx char and if it's not
      * prefixed with '\', truncate the buffer */
-    while (m = strstr(s2, rxc + 1)) {
+    while ((m = strstr(s2, rxc + 1))) {
       m2 = strstr(s2, rxc);
       if (m && (!m2 || (m2 && m2 + 1 != m)))
         *m = '\0';
@@ -656,12 +657,10 @@ struct animenucontext *animenu_create(struct animenucontext *parent, enum animen
   char file[BUFSIZE + 1] = "";
   struct animenucontext *menu;
   FILE *f;
-  struct stat statbuf;
   char **itemcfg;
   char typebuf[BUFSIZE + 1];
   char titlebuf[BUFSIZE + 1];
   char cmdbuf[BUFSIZE + 1];
-  char regexbuf[BUFSIZE + 1];
 
   struct animenu_options* options = get_options();
 
@@ -704,7 +703,7 @@ struct animenucontext *animenu_create(struct animenucontext *parent, enum animen
         /* set up a submenu */
         snprintf(file, BUFSIZE + 1, "%s/.animenu/%s", getenv("HOME"), animenu_stripwhitespace(cmdbuf));
         struct animenucontext *submenu;
-        if (submenu = animenu_create(menu, animenuitem_submenu, file))
+        if ((submenu = animenu_create(menu, animenuitem_submenu, file)))
           item->setsubmenu(item, animenu_stripwhitespace(titlebuf), submenu);
         else {
           item->dispose(item);
