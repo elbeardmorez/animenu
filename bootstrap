@@ -3,9 +3,12 @@
 prgnam=animenu
 target=/usr/local
 
+[ -f ./Makefile ] &&
+  echo -e '\n# removing existing build files\n' &&
+  make distclean
 echo -e '\n# bootstrapping build files, installing macros etc.\n'
 [ -f ./configure.in ] && rm ./configure.in
-autoreconf --install --verbose || exit 
+autoreconf --install --verbose || exit
 echo -e '\n# testing system and configuring build tools\n'
 [ -f ./configure ] && ./configure --prefix=$target $@ || exit
 echo -e "
