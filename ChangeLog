@@ -1,3 +1,15 @@
+2014Aug10 version 0572a0ba2efa0fe869c181406177c55af94921d4
+ - [fix] help option typos (Pete Beardmore)
+2013Apr29 version e027e3a4cbf29f817b72afd4e4d4d3c8e8494aa6
+ - [sup] whitespace changes only (Pete Beardmore)
+2013Apr29 version 9bceb74d59c63d69c70528d15ea418e14d111e13
+ - [add] support dynamic lircrc updates (Pete Beardmore)
+2013Apr29 version c6e12ffdc0528fbbfa3f3db3d3fd3a6b04433ba4
+ - [fix] fallout from -Wall -WError build flags (Pete Beardmore)
+2013Apr25 version 1e828e3e617e05abf810c31918e8e9d100d2efd9
+ - [add] options redux (Pete Beardmore)
+2013Apr25 version 8ce37e0b281f948d49da1182eae6dcda3a4eb825
+ - [sup] update project files (Pete Beardmore)
 2013Apr24 version 7a47ee20a96adc9f0b569346a23798d90b4d2993
  - [imp] don't use PATH_MAX (Pete Beardmore)
 2013Apr24 version 0e1ef68da08a47832faedf8f069c6e4fa6d4372c

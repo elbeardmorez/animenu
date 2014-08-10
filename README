@@ -28,36 +28,34 @@ animenu is released under the GPL version 2; for details please see the file
 "COPYING".
 
 ##########
-# commands
+# usage command/options
 
-animenu takes the following options:
-
-  -h --help              display a help message
-  -v --version           display version
-  -d --daemon            run in background
-  -f --fontspec          use full font specification
-                         (x11 fontspec, as returned by xfontsel)
-  -n --fontname          specify font by family name only
-                         (i.e. Bitstream Charter, Fixed, etc.)
-  -s --fontsize          specify font by family name only
-  -b --bgcolour          use specified background colour
-  -c --fgcolour          use specified foreground colour
-  -s --fgcoloursel       colour of selected item
-  -t --menutimeout       how long before menu disappears (0 for no timeout)
-  -a --menuanimation     menu animation speed (microseconds)
-  -M --dump              dump menu structure to screen
-  -D[x] --debug[=x]      enable log, optional verbosity level [1 .. 2] (default: 1)
+usage: animenu [options] [lircrc]
+  -h    --help          display this message
+  -v    --version       display version
+  -d    --daemon        run in background
+  -f    --fontspec      use specified font (xfontsel format)
+  -n    --fontname      specify font by family name only
+  -z    --fontsize      set the font size
+  -b    --bgcolour      use specified background colour
+  -c    --fgcolour      use specified foreground colour
+  -s    --fgcoloursel   colour of selected item
+  -t    --menutimeout   how long before menu disappears (0 for no timeout)
+  -a    --menuanimation menu animation speed (microseconds)
+  -M    --dump          dump menu structure to screen
+  -D[x] --debug[=x]     enable log. optional verbosity [1 .. 2] (default: 1)
 
 ###############
 # lirc commands
 
 the following commands can be used in your '.lircrc' file:
 
-  Show
-  Next
-  Prev
-  Select
-  Back
+  show
+  select
+  next
+  prev
+  back
+  forward
 
 #####################
 # configuration files
@@ -85,7 +83,7 @@ browse /path/regexp_pattern
   <title>
   <command for selected file>
 
-browse_re curse /path/regexp_pattern
+browse_recurse /path/regexp_pattern
   <title>
   <command for selected file>
 
