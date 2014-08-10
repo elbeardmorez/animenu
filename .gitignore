@@ -2,6 +2,7 @@
 *.swp
 *.orig
 *.o
+bin/
 animenu
 *Makefile.in
 *Makefile
