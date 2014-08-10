@@ -2,7 +2,7 @@
 /*
  * animenu - lirc menu system
  *
- *  copyright (c) 2009, 2012-2013 by Pete Beardmore <pete.beardmore@msn.com>
+ *  copyright (c) 2009, 2012-2014 by Pete Beardmore <pete.beardmore@msn.com>
  *  copyright (c) 2001-2003 by Alastair M. Robinson <blackfive@fakenhamweb.co.uk>
  *
  *  licensed under GNU General Public License 2.0 or later
@@ -88,15 +88,11 @@ static void osd_showselected(struct osdcontext *osd, int selected) {
   while (ud) {
     ud = osd->priv->osdidcallback(ud, &oid);
     if (oid) {
-      if (i == selected) {
+      if (oid->title)
         XDrawString(osd->priv->display, osd->priv->win,
-                    osd->priv->lightgrngc, 16, i * osd->priv->itemheight + osd->priv->itemoffset,
+                    i == selected ? osd->priv->lightgrngc : osd->priv->greengc,
+                    16, i * osd->priv->itemheight + osd->priv->itemoffset,
                     oid->title, strlen(oid->title));
-      } else {
-        XDrawString(osd->priv->display, osd->priv->win,
-                    osd->priv->greengc, 16, i * osd->priv->itemheight + osd->priv->itemoffset,
-                    oid->title, strlen(oid->title));
-      }
     }
     ++i;
   }
@@ -159,9 +155,11 @@ static void osd_showframe(struct osdcontext *osd, int frame) {
           XCopyArea(osd->priv->display, osd->priv->bg_shaded, osd->priv->win,
                     osd->priv->greengc, 0, i * osd->priv->itemheight,
                     edge, osd->priv->itemheight, 0, i * osd->priv->itemheight);
-          XDrawString(osd->priv->display, osd->priv->win,
-                      osd->priv->greengc, edge - (osd->priv->width - 16),
-                      i * osd->priv->itemheight + osd->priv->itemoffset, oid->title, strlen(oid->title));
+          if (oid->title) {
+            XDrawString(osd->priv->display, osd->priv->win,
+                        osd->priv->greengc, edge - (osd->priv->width - 16),
+                        i * osd->priv->itemheight + osd->priv->itemoffset, oid->title, strlen(oid->title));
+          }
           oid->lastedge = edge;
         }
       }
@@ -216,10 +214,12 @@ static void osd_hideframe(struct osdcontext *osd, int frame) {
           XCopyArea(osd->priv->display, osd->priv->bg_shaded, osd->priv->win,
                     osd->priv->greengc, edge, i * osd->priv->itemheight,
                     osd->priv->width - edge, osd->priv->itemheight, edge, i * osd->priv->itemheight);
-          XDrawString(osd->priv->display, osd->priv->win,
-                      osd->priv->greengc, edge + 16, i * osd->priv->itemheight + osd->priv->itemoffset,
-                      oid->title, strlen(oid->title));
-          oid->lastedge = edge;
+          if (oid->title) {
+            XDrawString(osd->priv->display, osd->priv->win,
+                        osd->priv->greengc, edge + 16, i * osd->priv->itemheight + osd->priv->itemoffset,
+                        oid->title, strlen(oid->title));
+            oid->lastedge = edge;
+          }
         }
       }
       ++i;
@@ -297,9 +297,9 @@ static void osd_calcdimensions(struct osdcontext *osd) {
       ++count;
     }
   }
-  osdp->width = width;
-  osdp->height = height;
-  osdp->itemcount = count;
+  osdp->width = _max(width, 100);
+  osdp->height = _max(height, osd->priv->itemheight);
+  osdp->itemcount = _max(count, 1);
 }
 
 struct osdcontext *osd_create(struct osdcontext *parent,

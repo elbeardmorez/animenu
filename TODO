@@ -15,10 +15,9 @@
 -remember menu path and reconstruct it on menu show
 -enable non-show commands only if menu shown
 -remove invisible item when cycling menu
--fix segfault on empty folders
--fix various failing regexp based browse menus
 -use an options struct for animenu_create
 -browse blocks
+-fix various failing regexp based browse menus
 -expand regular expressions support
 -browse sort order
 -max menu width

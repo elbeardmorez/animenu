@@ -2,7 +2,7 @@
 /**
  * animenu - lirc menu system
  *
- *  copyright (c) 2009, 2012-2013 by Pete Beardmore <pete.beardmore@msn.com>
+ *  copyright (c) 2009, 2012-2014 by Pete Beardmore <pete.beardmore@msn.com>
  *  copyright (c) 2001-2003 by Alastair M. Robinson <blackfive@fakenhamweb.co.uk>
  *
  *  licensed under GNU General Public License 2.0 or later
@@ -79,15 +79,19 @@ static int animenuitem_setitem(struct animenuitem *mi, enum animenuitem_type typ
   int success = TRUE;
   if (mi->title)
     free(mi->title);
-  if (!(mi->title = strdup(title)))
-    success = FALSE;
-
+  if (title) {
+    if (!(mi->title = strdup(title)))
+      success = FALSE;
+  } else
+    mi->title = "";
   mi->osddata.title = mi->title;
 
   if (mi->command)
     free(mi->command);
-  if (!(mi->command = strdup(command)))
-    success = FALSE;
+  if (command) {
+    if (!(mi->command = strdup(command)))
+      success = FALSE;
+  }
 
   mi->type = type;
   mi->path = path;
@@ -96,8 +100,11 @@ static int animenuitem_setitem(struct animenuitem *mi, enum animenuitem_type typ
   mi->submenu = NULL;
 
   if (type == animenuitem_browse) {
-    mi->regex = malloc(BUFSIZE + 1);
-    strncpy(mi->regex, regex, BUFSIZE + 1);
+    if (regex) {
+      mi->regex = malloc(BUFSIZE + 1);
+      strncpy(mi->regex, regex, BUFSIZE + 1);
+    } else
+      success = FALSE;
   }
   mi->recurse = recurse;
 
@@ -639,6 +646,10 @@ int animenu_browse(struct animenuitem *mi) {
         mi2->setitem(mi2, animenuitem_browse, title, file_cur->file, mi->regex, mi->command, mi->recurse);
       }
     }
+  } else {
+    /* create empty item for empty menu */
+    mi2 = animenuitem_create(menu);
+    mi2->setitem(mi2, animenuitem_null, NULL, NULL, NULL, NULL, 0);
   }
 
   /* generate the osd tree */
