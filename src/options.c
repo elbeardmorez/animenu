@@ -2,7 +2,7 @@
 /**
  * animenu - lirc menu system
  *
- *  copyright (c) 2009, 2012-2013 by Pete Beardmore <pete.beardmore@msn.com>
+ *  copyright (c) 2009, 2012-2014 by Pete Beardmore <pete.beardmore@msn.com>
  *  copyright (c) 2002 by Massimo Maricchiolo <mmaricch@yahoo.com>
  *  copyright (c) 2001-2003 by Alastair M. Robinson <blackfive@fakenhamweb.co.uk>
  *
@@ -139,20 +139,20 @@ int process_options(int argc, char *argv[]) {
       break;
     switch (c) {
       case 'h':
-        printf("Usage: %s [options]\n", argv[0]);
-        printf("\t -h    --help\t\tdisplay this message\n");
-        printf("\t -v    --version\t\tdisplay version\n");
-        printf("\t -d    --daemon\t\trun in background\n");
-        printf("\t -f    --fontspec\t\tuse specified font (xfontsel format)\n");
-        printf("\t -n    --fontname\t\tspecify font by family name only\n");
-        printf("\t -z    --fontsize\t\tset the font size\n");
-        printf("\t -b    --bgcolour\t\tuse specified background colour\n");
-        printf("\t -c    --fgcolour\t\tuse specified foreground colour\n");
-        printf("\t -s    --fgcoloursel\t\tcolour of selected item\n");
-        printf("\t -t    --menutimeout\t\thow long before menu dissapears (0 for no timeout)\n");
-        printf("\t -a    --menuanimation\t\tmenu animation speed (microseconds)\n");
-        printf("\t -M    --dump\t\tdump menu structure to screen\n");
-        printf("\t -D[x] --debug=[x]\tenable log. optional verbosity [1 .. 2] (default: 1)\n");
+        printf("usage: %s [options] [lircrc]\n", argv[0]);
+        printf("  -h    --help\t\tdisplay this message\n");
+        printf("  -v    --version\tdisplay version\n");
+        printf("  -d    --daemon\trun in background\n");
+        printf("  -f    --fontspec\tuse specified font (xfontsel format)\n");
+        printf("  -n    --fontname\tspecify font by family name only\n");
+        printf("  -z    --fontsize\tset the font size\n");
+        printf("  -b    --bgcolour\tuse specified background colour\n");
+        printf("  -c    --fgcolour\tuse specified foreground colour\n");
+        printf("  -s    --fgcoloursel\tcolour of selected item\n");
+        printf("  -t    --menutimeout\thow long before menu disappears (0 for no timeout)\n");
+        printf("  -a    --menuanimation\tmenu animation speed (microseconds)\n");
+        printf("  -M    --dump\t\tdump menu structure to screen\n");
+        printf("  -D[x] --debug[=x]\tenable log. optional verbosity [1 .. 2] (default: 1)\n");
         return (option_exitsuccess);
       case 'v':
         printf("%s\n", options.progname);
