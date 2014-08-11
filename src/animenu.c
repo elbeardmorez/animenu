@@ -2,7 +2,7 @@
 /**
  * animenu - lirc menu system
  *
- *  copyright (c) 2009, 2012-2013 by Pete Beardmore <pete.beardmore@msn.com>
+ *  copyright (c) 2009, 2012-2014 by Pete Beardmore <pete.beardmore@msn.com>
  *  copyright (c) 2001-2003 by Alastair M. Robinson <blackfive@fakenhamweb.co.uk>
  *
  *  licensed under GNU General Public License 2.0 or later
@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
   /* create root menu */
   char file[PATH_MAX] = "";
   snprintf(file, PATH_MAX - 1, "%s/.animenu/%s", getenv("HOME"), "root.menu");
-  if (!(rootmenu = animenu_create(NULL, animenuitem_submenu, file))) {
+  if (!animenu_initialise(&rootmenu, file)) {
     fprintf(stderr, "cannot create root menu!\n");
     return(EXIT_FAILURE);
   }
@@ -209,11 +209,13 @@ int main(int argc, char *argv[]) {
           case id_forward:
             if (currentmenu != NULL && currentmenu->currentitem != NULL) {
               currentmenu->currentitem->select(currentmenu->currentitem);
-              if ((currentmenu->currentitem->submenu != NULL) &&
-                  (currentmenu->currentitem->submenu->visible)) {
-                currentmenu = currentmenu->currentitem->submenu;
-                if (strstr(currentmenu->currentitem->title, playall) != 0)
-                  currentmenu->next(currentmenu);
+              if ((currentmenu->currentitem->menu != NULL) &&
+                  (currentmenu->currentitem->menu->visible)) {
+                currentmenu = currentmenu->currentitem->menu;
+                if (currentmenu->currentitem->title) {
+                  if (strstr(currentmenu->currentitem->title, playall) != 0)
+                    currentmenu->next(currentmenu);
+                }
                 if (options->debug > 0)
                   printf("current item: '%s'\n", currentmenu->currentitem->title);
               }
